@@ -1,0 +1,98 @@
+import type { Category } from "@/types/commerce";
+
+export const categories: Category[] = [
+  {
+    id: "kashmir-willow-bats",
+    slug: "kashmir-willow-bats",
+    name: "Kashmir Willow Bats",
+    descriptor: "Authentic valley willow for every level",
+    image: "/categories/kashmir-willow.jpg",
+    iconKey: "kashmir-willow",
+    accent: "forest",
+  },
+  {
+    id: "english-willow-bats",
+    slug: "english-willow-bats",
+    name: "English Willow Bats",
+    descriptor: "Premium grade English willow",
+    image: "/categories/english-willow.jpg",
+    iconKey: "english-willow",
+    accent: "brass",
+  },
+  {
+    id: "batting-gloves",
+    slug: "batting-gloves",
+    name: "Batting Gloves",
+    descriptor: "Protection with feel and flexibility",
+    image: "/categories/batting-gloves.jpg",
+    iconKey: "gloves",
+    accent: "warm",
+  },
+  {
+    id: "batting-pads",
+    slug: "batting-pads",
+    name: "Batting Pads",
+    descriptor: "Lightweight, durable leg guards",
+    image: "/categories/batting-pads.jpg",
+    iconKey: "pads",
+    accent: "charcoal",
+  },
+  {
+    id: "thigh-guards",
+    slug: "thigh-guards",
+    name: "Thigh Guards",
+    descriptor: "Essential upper-leg protection",
+    image: "/categories/thigh-guards.jpg",
+    iconKey: "thigh-guard",
+    accent: "sage",
+  },
+  {
+    id: "helmets",
+    slug: "helmets",
+    name: "Helmets",
+    descriptor: "Safety-certified head protection",
+    image: "/categories/helmets.jpg",
+    iconKey: "helmet",
+    accent: "forest",
+  },
+  {
+    id: "cricket-balls",
+    slug: "cricket-balls",
+    name: "Cricket Balls",
+    descriptor: "Match and practice balls",
+    image: "/categories/cricket-balls.jpg",
+    iconKey: "ball",
+    accent: "brass",
+  },
+  {
+    id: "cricket-shoes",
+    slug: "cricket-shoes",
+    name: "Cricket Shoes",
+    descriptor: "Grip, comfort, and stability",
+    image: "/categories/cricket-shoes.jpg",
+    iconKey: "shoes",
+    accent: "warm",
+  },
+  {
+    id: "cricket-bags",
+    slug: "cricket-bags",
+    name: "Cricket Bags",
+    descriptor: "Kit bags for every cricketer",
+    image: "/categories/cricket-bags.jpg",
+    iconKey: "bag",
+    accent: "charcoal",
+  },
+  {
+    id: "accessories",
+    slug: "accessories",
+    name: "Accessories",
+    descriptor: "Grips, tapes, guards & more",
+    image: "/categories/accessories.jpg",
+    iconKey: "accessories",
+    accent: "sage",
+  },
+];
+
+export function getCategoryBySlug(slug: string): Category | undefined {
+  return categories.find((c) => c.slug === slug);
+}

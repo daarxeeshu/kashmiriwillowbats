@@ -1,0 +1,58 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import { siteConfig } from "@/data/site-config";
+import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { PageHeader } from "@/components/catalog/PageHeader";
+import { Container } from "@/components/ui/Container";
+import { ButtonLink } from "@/components/ui/Button";
+import { formatPrice } from "@/lib/utils";
+import { buildWhatsAppUrl, whatsappMessages } from "@/lib/whatsapp";
+
+export const metadata: Metadata = {
+  title: "Customize Your Bat",
+  description: "Laser name engraving on cricket bats — ₹200, free above ₹6,000.",
+};
+
+export default function CustomizePage() {
+  const { price, freeThreshold } = siteConfig.engraving;
+
+  return (
+    <Container className="section-padding">
+      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Customize" }]} />
+      <div className="mt-6 grid gap-10 lg:grid-cols-2 lg:items-center">
+        <PageHeader
+          eyebrow="Laser engraving"
+          title="Make it yours."
+          description="Add your name to your bat with professional in-house laser engraving before dispatch."
+        />
+        <div className="relative aspect-[4/3] overflow-hidden rounded-sm border border-border lg:aspect-square">
+          <Image src="/hero/engraving.jpg" alt="" fill className="object-cover" />
+        </div>
+      </div>
+
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:max-w-2xl">
+        <div className="rounded-sm border border-border bg-surface p-5">
+          <p className="text-xs font-medium text-muted">Engraving fee</p>
+          <p className="mt-1 text-2xl font-semibold">{formatPrice(price)}</p>
+        </div>
+        <div className="rounded-sm border border-accent/25 bg-accent-muted p-5">
+          <p className="text-xs font-medium text-accent">Free above</p>
+          <p className="mt-1 text-2xl font-semibold text-accent">
+            {formatPrice(freeThreshold)}
+          </p>
+        </div>
+      </div>
+
+      <ButtonLink
+        href={buildWhatsAppUrl(whatsappMessages.engraving)}
+        target="_blank"
+        rel="noopener noreferrer"
+        variant="primary"
+        size="lg"
+        className="mt-8"
+      >
+        Request engraving on WhatsApp
+      </ButtonLink>
+    </Container>
+  );
+}

@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+/* ── Design tokens ── */
+@theme {
+  --color-background:       #0e0d0b;
+  --color-foreground:       #f5f1eb;
+
+  --color-border:           rgba(255, 255, 255, 0.08);
+  --color-border-strong:    rgba(255, 255, 255, 0.16);
+
+  --color-muted-foreground: rgba(255, 255, 255, 0.55);
+  --color-muted:            rgba(255, 255, 255, 0.40);
+
+  /* Brand gold */
+  --color-accent:           #9a7b4f;
+  --color-accent-hover:     #b8945f;
+  --color-accent-muted:     rgba(154, 123, 79, 0.14);
+
+  /* Layered surfaces, lightest last */
+  --color-surface-dark:     #0b0a09;
+  --color-surface:          #161512;
+  --color-surface-card:     #1a1916;
+  --color-surface-elevated: #1f1d19;
+
+  /* Forest green: deep tones carry white text, -light is for text on dark */
+  --color-forest:           #1f4d33;
+  --color-forest-hover:     #2a6644;
+  --color-forest-muted:     rgba(63, 138, 90, 0.16);
+  --color-forest-light:     #7cc496;
+
+  /* “Bat expert” highlight */
+  --color-expert:           #d8b46a;
+  --color-expert-muted:     rgba(216, 180, 106, 0.12);
+
+  --color-success:          #6bbf8a;
+}
+
+/* ── Force critical position utilities (Tailwind v4 fix) ── */
+@layer base {
+  .relative { position: relative; }
+  .absolute { position: absolute; }
+  .fixed    { position: fixed;    }
+  .sticky   { position: sticky;   }
+}
+
+/* ── Container ── */
+@layer components {
+  .container-main {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 80rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container-main {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-main {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+}
+
+/* ── Section spacing ── */
+@layer components {
+  .section-padding {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  @media (min-width: 640px) {
+    .section-padding {
+      padding-top: 5rem;
+      padding-bottom: 5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-padding {
+      padding-top: 6rem;
+      padding-bottom: 6rem;
+    }
+  }
+}
+
+/* ── Typography ── */
+@layer components {
+  .eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #9a7b4f;
+  }
+
+  .heading-xl {
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* ── Hero studio background ── */
+@layer utilities {
+  .studio-bg {
+    background-color: #f5f0ea;
+  }
+
+  .willow-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+  }
+}
+
+/* ── Brand card entrance animation ── */
+@keyframes brandCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* legacy class kept for any existing usage */
+@keyframes brand-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-brand-card-in {
+  animation: brand-card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.brand-card-animate {
+  opacity: 0;
+  animation: brandCardIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── Hero scroll cue ── */
+@keyframes scrollCue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(7px);
+    opacity: 0.9;
+  }
+}
+
+.animate-scroll-cue {
+  animation: scrollCue 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-scroll-cue,
+  .animate-brand-card-in,
+  .brand-card-animate {
+    animation: none;
+  }
+
+  .brand-card-animate {
+    opacity: 1;
+  }
+}
