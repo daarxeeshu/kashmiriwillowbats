@@ -1,10 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { FacebookIcon, InstagramIcon } from "@/components/ui/SocialIcons";
 import { Container } from "@/components/ui/Container";
 import { siteConfig } from "@/data/site-config";
-import { buildWhatsAppUrl, whatsappMessages } from "@/lib/whatsapp";
+import { whatsappHref, whatsappMessages } from "@/lib/whatsapp";
 import type { FooterLinkGroup } from "@/types/commerce";
+import logoMark from "@/public/brand/logo.png";
 
 const footerGroups: FooterLinkGroup[] = [
   {
@@ -21,7 +23,7 @@ const footerGroups: FooterLinkGroup[] = [
     title: "Customer Care",
     links: [
       { label: "Contact", href: "/contact" },
-      { label: "WhatsApp", href: buildWhatsAppUrl(whatsappMessages.general) },
+      { label: "WhatsApp", href: whatsappHref(whatsappMessages.general) },
       { label: "Shipping", href: "/shipping" },
       { label: "Returns", href: "/returns" },
       { label: "Warranty", href: "/warranty" },
@@ -55,7 +57,18 @@ export function Footer() {
       <Container className="section-padding">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-1">
-            <Link href="/" className="inline-block">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-3"
+              aria-label={`${siteConfig.name} home`}
+            >
+              <Image
+                src={logoMark}
+                // Decorative — see the note in Header.
+                alt=""
+                sizes="52px"
+                className="h-13 w-13 rounded-md object-cover"
+              />
               <span className="text-lg font-bold tracking-tight">Kashmiri Willow Bats</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/65">
@@ -82,7 +95,7 @@ export function Footer() {
                 <FacebookIcon className="h-4 w-4" />
               </a>
               <a
-                href={buildWhatsAppUrl(whatsappMessages.general)}
+                href={whatsappHref(whatsappMessages.general)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-sm border border-white/15 text-white/70 transition-colors hover:border-white/30 hover:text-white"

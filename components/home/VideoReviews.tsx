@@ -15,6 +15,7 @@ export function VideoReviews() {
     <section className="section-padding bg-background" aria-labelledby="reviews-heading">
       <Container>
         <SectionHeading
+          titleId="reviews-heading"
           eyebrow="Verified buyers"
           title="Real players. Real bats. Real reviews."
           description="Unboxing videos, ping tests, and product photos from verified customers. Rewards apply regardless of rating."
@@ -32,7 +33,12 @@ export function VideoReviews() {
                 key={item.id}
                 className="relative w-[220px] shrink-0 snap-start overflow-hidden rounded-sm border border-border bg-surface-elevated sm:w-[240px] lg:w-auto"
               >
-                <div className="relative aspect-[9/14] bg-foreground">
+                {/* `bg-foreground` was here, which is the cream *text* colour
+                    (#f5f1eb) — so these four tiles rendered as big pale slabs
+                    with their white-on-white labels invisible. A video
+                    thumbnail should read dark; every child here is already
+                    styled for a dark ground. */}
+                <div className="relative aspect-[9/14] bg-surface-dark">
                   <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
                     <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white">
                       <Play className="h-5 w-5" fill="currentColor" />
@@ -40,7 +46,7 @@ export function VideoReviews() {
                     <p className="mt-4 text-sm font-semibold text-white">
                       {item.label}
                     </p>
-                    <p className="mt-2 text-[11px] text-white/60">{item.note}</p>
+                    <p className="mt-2 text-[12px] text-white/60">{item.note}</p>
                   </div>
                 </div>
               </div>

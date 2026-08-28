@@ -13,7 +13,9 @@ export function BatExpert() {
               alt="Bat expert"
               fill
               className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
+              /* Same two-column geometry as BrandStory: 584px at the container
+                 cap, max-w-xl (576px) below lg. See BrandStory for the maths. */
+              sizes="(min-width: 1280px) 584px, (min-width: 1024px) calc(50vw - 3.5rem), (min-width: 624px) 576px, calc(100vw - 2rem)"
             />
           </div>
         </FadeIn>

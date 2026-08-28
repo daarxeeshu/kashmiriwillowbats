@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img" aria-label="Hard tennis bat category">
+  <!--
+    Category cover for HARD TENNIS BAT.
+
+    Deliberately a drawn graphic rather than a photograph. No hard-tennis-bat product
+    photography exists in this project, and inventing a product shot would put an
+    image of a bat we do not stock in front of a customer. So this follows the
+    convention already established by scripts/generate-brand-covers.mjs and by seven
+    of the eight product placeholders: the site's own palette, an abstract subject,
+    nothing that could be mistaken for a specific model.
+
+    800x600 to match the brand covers, with the subject held well inside the middle
+    two thirds — every consumer of Category.image crops with object-cover, at ratios
+    from the 200x212 carousel tile to a wide equipment card, and a centred
+    composition survives all of them.
+
+    Replace with real photography when it exists; nothing but this file changes.
+  -->
+  <defs>
+    <linearGradient id="htb-base" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#26241f" />
+      <stop offset="100%" stop-color="#100f0d" />
+    </linearGradient>
+
+    <radialGradient id="htb-glow" cx="50%" cy="48%" r="54%">
+      <stop offset="0%" stop-color="#d8b46a" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#d8b46a" stop-opacity="0" />
+    </radialGradient>
+
+    <radialGradient id="htb-vignette" cx="50%" cy="50%" r="72%">
+      <stop offset="55%" stop-color="#000000" stop-opacity="0" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.45" />
+    </radialGradient>
+  </defs>
+
+  <rect width="100%" height="100%" fill="url(#htb-base)" />
+  <rect width="100%" height="100%" fill="url(#htb-glow)" />
+
+  <!-- Impact arcs: the one idea this category is sold on, drawn rather than stated. -->
+  <g fill="none" stroke="#d8b46a" stroke-linecap="round">
+    <circle cx="527" cy="366" r="96" stroke-width="2" opacity="0.10" />
+    <circle cx="527" cy="366" r="140" stroke-width="2" opacity="0.07" />
+    <circle cx="527" cy="366" r="188" stroke-width="2" opacity="0.045" />
+  </g>
+
+  <!-- Bat, tilted into the ball. Blade + shoulder + handle as one path so the
+       silhouette reads at 200px wide, where separate strokes would muddy. -->
+  <g transform="rotate(-19 400 300)">
+    <path
+      d="M352 128 h44 a14 14 0 0 1 14 14 v92 h18 a22 22 0 0 1 22 22 v186 a26 26 0 0 1 -26 26 h-100 a26 26 0 0 1 -26 -26 v-186 a22 22 0 0 1 22 -22 h18 v-92 a14 14 0 0 1 14 -14 z"
+      fill="#8a6f49"
+      opacity="0.92"
+    />
+    <!-- Grain lines down the blade. Four, evenly spaced — enough to read as willow. -->
+    <g stroke="#0f0e0c" stroke-width="2" opacity="0.22">
+      <line x1="356" y1="262" x2="356" y2="452" />
+      <line x1="381" y1="256" x2="381" y2="452" />
+      <line x1="406" y1="256" x2="406" y2="452" />
+      <line x1="431" y1="262" x2="431" y2="452" />
+    </g>
+    <!-- Lit edge, the same one-edge-catches-light trick the glass cards use. -->
+    <path
+      d="M334 256 a22 22 0 0 1 22 -22 h18 v-92 a14 14 0 0 1 14 -14 h10 v128 h-64 v186 a26 26 0 0 0 8 19 a26 26 0 0 1 -8 -19 z"
+      fill="#c79a5e"
+      opacity="0.5"
+    />
+    <!-- Grip. -->
+    <rect x="350" y="128" width="48" height="106" rx="12" fill="#1c1a17" opacity="0.85" />
+    <g stroke="#3a352d" stroke-width="2" opacity="0.7">
+      <line x1="352" y1="150" x2="396" y2="158" />
+      <line x1="352" y1="172" x2="396" y2="180" />
+      <line x1="352" y1="194" x2="396" y2="202" />
+      <line x1="352" y1="216" x2="396" y2="224" />
+    </g>
+  </g>
+
+  <!-- Ball. A tennis ball, not a leather one: this category is defined by it. -->
+  <circle cx="527" cy="366" r="47" fill="#c8cf62" opacity="0.9" />
+  <circle cx="527" cy="366" r="47" fill="none" stroke="#0f0e0c" stroke-width="2" opacity="0.25" />
+  <path
+    d="M492 335 a58 58 0 0 1 0 62"
+    fill="none"
+    stroke="#f2f4d8"
+    stroke-width="3"
+    opacity="0.65"
+  />
+  <path
+    d="M562 335 a58 58 0 0 0 0 62"
+    fill="none"
+    stroke="#f2f4d8"
+    stroke-width="3"
+    opacity="0.65"
+  />
+  <circle cx="512" cy="349" r="16" fill="#ffffff" opacity="0.12" />
+
+  <rect width="100%" height="100%" fill="url(#htb-vignette)" />
+</svg>

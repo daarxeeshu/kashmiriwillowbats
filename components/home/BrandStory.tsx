@@ -13,7 +13,11 @@ export function BrandStory() {
               alt="Brand story"
               fill
               className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
+              /* container-main caps at 80rem − 1.5rem padding = 1232px, so the
+                 lg:gap-16 column settles at (1232 − 64) / 2 = 584px. Below lg the
+                 wrapper's max-w-xl caps it at 576px. A plain `50vw` here would
+                 make wide screens fetch ~2x the pixels the box can show. */
+              sizes="(min-width: 1280px) 584px, (min-width: 1024px) calc(50vw - 3.5rem), (min-width: 624px) 576px, calc(100vw - 2rem)"
             />
           </div>
         </FadeIn>

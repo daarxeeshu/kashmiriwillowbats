@@ -65,19 +65,37 @@ export function TrustSection() {
   return (
     <section className="section-padding bg-surface" aria-labelledby="trust-heading">
       <Container>
-        <SectionHeading eyebrow="Why us" title="Why shop with us" />
+        <SectionHeading titleId="trust-heading" eyebrow="Why us" title="Why shop with us" />
 
+        {/* ── Two up on a phone, and titles only there ────────────────────────────
+            Six points in one column is six full-width cards of icon, heading and a
+            three-line paragraph — a long scroll through items that look identical, so
+            the reader stops reading and starts flicking, which is the opposite of what
+            a reassurance section is for. Two columns turns six rows into three.
+
+            The descriptions are the other half of it, and they are dropped below `sm`
+            rather than squeezed: at 390px a two-column cell is about 170px wide, and a
+            sentence like "Speak directly with cricket specialists who know willow,
+            weight, and pickup" sets to five or six lines in that measure — which would
+            put the height straight back and read worse besides. The titles are written
+            to stand alone ("Expert Bat Selection", "Safe Delivery"), so what is left is
+            a scannable grid of claims rather than a wall of prose.
+
+            `hidden` rather than a visual-only hide, deliberately: a screen reader on a
+            phone gets the same six claims a sighted reader does, and nothing announced
+            that is not on screen. Everything returns from `sm`, where the measure can
+            carry it. */}
         <FadeIn className="mt-8">
-          <ul className="grid gap-px overflow-hidden rounded-sm border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-border bg-border lg:grid-cols-3">
             {trustPoints.map((point: TrustPoint) => {
               const Icon = trustIcons[point.icon] ?? ShieldCheck;
               return (
-                <li key={point.id} className="bg-surface p-6">
+                <li key={point.id} className="bg-surface p-4 sm:p-6">
                   <Icon className="h-5 w-5 text-accent" aria-hidden="true" />
-                  <h3 className="mt-4 text-sm font-semibold tracking-tight">
+                  <h3 className="mt-3 text-sm font-semibold tracking-tight sm:mt-4">
                     {point.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  <p className="mt-2 hidden text-sm leading-relaxed text-muted-foreground sm:block">
                     {point.description}
                   </p>
                 </li>

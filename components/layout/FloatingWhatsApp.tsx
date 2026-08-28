@@ -6,7 +6,10 @@ import { buildWhatsAppUrl, whatsappMessages } from "@/lib/whatsapp";
 
 export function FloatingWhatsApp() {
   return (
-    <div className="fixed bottom-5 right-5 z-40 md:bottom-7 md:right-7">
+    // `site-fab` is a styling hook, not a utility, for the same reason
+    // `site-announcement` is one: globals.css needs to yield this corner to the
+    // mobile hero's bottom-anchored CTAs while the stage still owns the screen.
+    <div className="site-fab fixed bottom-5 right-5 z-40 md:bottom-7 md:right-7">
       <GlassSurface
         borderRadius={999}
         opacity={0.94}

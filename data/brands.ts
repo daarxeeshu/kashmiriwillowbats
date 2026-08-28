@@ -6,9 +6,10 @@ export const brands: Brand[] = [
     id: "kis",
     slug: "kis",
     name: "KIS",
-    descriptor: "Khan International Sports — Unstoppable",
+    descriptor:
+      "Khan International Sports — the Valley's flagship bat maker, on cricket's international stage.",
     logo: "/brands/kis.svg",
-    image: "/brands/kis-cover.svg",
+    image: "/brands/kis-cover.jpg",
     isFlagship: true,
   },
   {
@@ -16,8 +17,8 @@ export const brands: Brand[] = [
     slug: "jk",
     name: "JK",
     descriptor: "Established Kashmir cricket brand",
-    logo: "/brands/jk.svg",
-    image: "/brands/jk-cover.svg",
+    logo: "/brands/jk.jpg",
+    image: "/brands/jk-cover.jpg",
   },
   {
     id: "valleywoods",
@@ -32,7 +33,8 @@ export const brands: Brand[] = [
     slug: "tramboo",
     name: "Tramboo",
     descriptor: "Kashmir willow craftsmen",
-    // no logo/image yet — typographic placeholder used automatically
+    image: "/brands/tramboo-cover.svg",
+    // no logo yet — typographic placeholder used automatically
   },
   {
     id: "woodford",

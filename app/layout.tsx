@@ -4,6 +4,7 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { FloatingWhatsApp } from "@/components/layout/FloatingWhatsApp";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { CartProvider } from "@/components/cart/CartProvider";
 import { siteConfig } from "@/data/site-config";
 import "./globals.css";
 
@@ -55,11 +56,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${bodyFont.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <AnnouncementBar />
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <FloatingWhatsApp />
+        <CartProvider>
+          <AnnouncementBar />
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <FloatingWhatsApp />
+        </CartProvider>
       </body>
     </html>
   );

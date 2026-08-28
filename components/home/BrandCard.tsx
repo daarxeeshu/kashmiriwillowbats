@@ -13,6 +13,8 @@ interface BrandCardProps {
   className?: string;
   variant?: "featured" | "standard" | "compact";
   index?: number;
+  /** Preload the cover. Set this on the card that is the page's LCP element. */
+  priority?: boolean;
 }
 
 export function BrandCard({
@@ -20,6 +22,7 @@ export function BrandCard({
   className,
   variant = "standard",
   index = 0,
+  priority = false,
 }: BrandCardProps) {
   const delay = index * 80;
 
@@ -49,6 +52,7 @@ export function BrandCard({
             src={brand.image}
             alt=""
             fill
+            priority={priority}
             className={cn(
               "object-cover object-center",
               "transition-transform duration-500 ease-out",
@@ -79,7 +83,12 @@ export function BrandCard({
         {/* Flagship badge */}
         {brand.isFlagship && (
           <div className="absolute left-4 top-4 z-10">
-            <span className="inline-block rounded-sm bg-[#9a7b4f] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white">
+            {/* 12px, matching `Badge` — this is the same chip in a different
+                component, and it sits on `/brands` where it is a real label rather
+                than decoration. Safe to raise where the hero spec panels are not:
+                this is `inline-block` over a cover image with room to spare, so it
+                grows to fit instead of being clipped by a fixed panel width. */}
+            <span className="inline-block rounded-sm bg-[#9a7b4f] px-2.5 py-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-white">
               Flagship
             </span>
           </div>
@@ -104,39 +113,28 @@ export function BrandCard({
           )}
         >
           <div className="min-w-0">
-            {/* Brand name — always visible */}
+            {/* Brand name — always visible. `truncate` keeps a two-word name
+                like "Valley Woods" on one line; wrapping made this panel a
+                row taller than its neighbours and broke the grid's alignment. */}
             <p
               className={cn(
-                "mb-1 font-semibold tracking-tight text-white",
+                "mb-1 truncate font-semibold tracking-tight text-white",
                 variant === "featured" ? "text-2xl" : "text-lg",
               )}
             >
               {brand.name}
             </p>
 
-            {/* Logo overlay if available */}
-            {brand.logo && (
-              <div
-                className={cn(
-                  "relative -mt-1 mb-1",
-                  variant === "featured" ? "h-7 w-28" : "h-5 w-20",
-                )}
-              >
-                <Image
-                  src={brand.logo}
-                  alt={brand.name}
-                  fill
-                  className="object-contain object-left brightness-0 invert transition-opacity duration-300 group-hover:opacity-90"
-                  sizes="112px"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.display = "none";
-                  }}
-                />
-              </div>
-            )}
+            {/* No logo overlay here on purpose. `brightness-0 invert` flattens
+                any opaque artwork to solid white, and every current logo asset
+                is opaque — the placeholder SVGs carry a cream background rect,
+                and /brands/jk.jpg is a photograph. The result was a white bar
+                on all eight cards. The brand name above already identifies the
+                card, so the overlay was duplicate content anyway. The logo is
+                still rendered on /brands/[slug], untinted on a surface plate. */}
 
             {variant === "featured" && brand.isFlagship && (
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9a7b4f]">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#9a7b4f]">
                 Unstoppable
               </p>
             )}

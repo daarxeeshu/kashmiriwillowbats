@@ -1,5 +1,5 @@
 import type { Product } from "@/types/commerce";
-import { ProductCard } from "@/components/home/ProductCard";
+import { ProductCardGrid } from "@/components/product/ProductCardGrid";
 import { ButtonLink } from "@/components/ui/Button";
 import { buildWhatsAppUrl, whatsappMessages } from "@/lib/whatsapp";
 
@@ -35,11 +35,14 @@ export function CatalogProductGrid({
     );
   }
 
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
-      ))}
-    </div>
-  );
+  /* Delegates entirely to the shared grid. This component's job is the empty state
+     above and nothing else — it used to carry its own column ladder
+     (`sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`), which was 1-up on every phone
+     and introduced a 3-up step the homepage never had. Two ladders also meant
+     `ProductCard`'s single `sizes` string was necessarily wrong for one of them.
+
+     `priorityCount={4}` because a catalogue page opens directly onto this grid, so
+     the first row really is above the fold — unlike the homepage section, which sits
+     below the hero. */
+  return <ProductCardGrid products={products} priorityCount={4} />;
 }

@@ -1,0 +1,77 @@
+<!--
+  PLACEHOLDER — awaiting real product photography.
+
+  Transparent background on purpose. `ProductImageFrame` derives each card's backdrop
+  from a blurred copy of this same file, so a cutout gets the dark studio surround and
+  its own soft warm halo instead of a hard-edged rectangle sitting inside the frame.
+  Replace this file with the real photograph at the same path — or drop in a .jpg and
+  change the one `image:` line in data/products.ts.
+
+  The five English Willow placeholders differ only in grain density and how much red
+  wood shows, because that is what English willow grading is. No grain *count* or any
+  other figure is printed as text: the drawing distinguishes the cards while the
+  layout is reviewed, and a printed number would be a specification claim about a bat
+  nobody has photographed yet. This one is the cleanest of the five.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <defs>
+    <radialGradient id="halo" cx="50%" cy="52%" r="52%">
+      <stop offset="0%" stop-color="#f4ecd8" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#f4ecd8" stop-opacity="0"/>
+    </radialGradient>
+    <!-- paler than the Kashmir willow placeholders, which is the honest visual
+         difference between the two timbers -->
+    <linearGradient id="wood" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#cbb992"/>
+      <stop offset="42%" stop-color="#f8f2e4"/>
+      <stop offset="70%" stop-color="#e6d9bd"/>
+      <stop offset="100%" stop-color="#b6a37c"/>
+    </linearGradient>
+    <linearGradient id="grip" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#241a0e"/>
+      <stop offset="45%" stop-color="#4a3620"/>
+      <stop offset="100%" stop-color="#1d1509"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="400" cy="520" rx="215" ry="400" fill="url(#halo)"/>
+
+  <!-- handle -->
+  <rect x="376" y="92" width="48" height="236" rx="24" fill="url(#grip)"/>
+  <g stroke="#000" stroke-opacity="0.22" stroke-width="4" stroke-linecap="round">
+    <line x1="382" y1="142" x2="418" y2="142"/>
+    <line x1="382" y1="182" x2="418" y2="182"/>
+    <line x1="382" y1="222" x2="418" y2="222"/>
+    <line x1="382" y1="262" x2="418" y2="262"/>
+  </g>
+
+  <!-- shoulders + blade -->
+  <path d="M424 322 Q452 342 457 404 C462 542 460 700 450 818 Q400 854 350 818 C340 700 338 542 343 404 Q348 342 376 322 Z"
+        fill="url(#wood)"/>
+
+  <!-- grains: the most of the five, and the straightest -->
+  <g stroke="#a89066" stroke-opacity="0.42" stroke-width="3" fill="none" stroke-linecap="round">
+    <path d="M357 372 C355 520 355 700 358 826"/>
+    <path d="M368 366 C367 520 367 700 369 830"/>
+    <path d="M379 362 C378 520 378 700 380 832"/>
+    <path d="M390 360 C390 520 390 700 391 834"/>
+    <path d="M401 359 C401 520 401 700 401 834"/>
+    <path d="M412 360 C412 520 412 700 411 834"/>
+    <path d="M423 362 C424 520 424 700 422 832"/>
+    <path d="M434 366 C435 520 435 700 433 830"/>
+    <path d="M445 372 C447 520 447 700 444 826"/>
+  </g>
+
+  <!-- edge shading, so the blade reads as a solid with a spine rather than a flat cut-out -->
+  <path d="M343 404 C338 542 340 700 350 818 Q368 830 384 834 C374 700 372 542 376 400 Z"
+        fill="#000" fill-opacity="0.1"/>
+  <path d="M457 404 C462 542 460 700 450 818 Q432 830 416 834 C426 700 428 542 424 400 Z"
+        fill="#000" fill-opacity="0.16"/>
+  <!-- twine binding at the splice -->
+  <rect x="378" y="318" width="44" height="16" rx="6" fill="#3d2914" fill-opacity="0.85"/>
+
+  <text x="400" y="920" fill="#9a9288" font-family="system-ui,sans-serif" font-size="21"
+        font-weight="600" letter-spacing="2" text-anchor="middle">GRADE 1+ PLAYER</text>
+  <text x="400" y="952" fill="#9a9288" fill-opacity="0.7" font-family="system-ui,sans-serif"
+        font-size="15" letter-spacing="1.5" text-anchor="middle">PHOTO PLACEHOLDER</text>
+</svg>

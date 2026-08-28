@@ -12,6 +12,15 @@ interface MobileMenuProps {
   onClose: () => void;
 }
 
+/* Shared by top-level items and by the links inside a group, so a grouped category is
+   the same size and the same tap target as an ungrouped one. `py-3` on a 14px line is a
+   44px row, which is the floor for a thumb. */
+const drawerLinkClass =
+  "flex items-center justify-between gap-2 rounded-sm px-3 py-3 text-sm transition-colors";
+
+const drawerLinkPlainClass =
+  "font-medium text-muted-foreground hover:bg-foreground/5 hover:text-foreground";
+
 export function MobileMenu({ open, onClose }: MobileMenuProps) {
   return (
     <>
@@ -46,17 +55,60 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
         </div>
 
         <ul className="flex-1 overflow-y-auto px-3 py-3">
-          {mainNav.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                onClick={onClose}
-                className="block rounded-sm px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
+          {mainNav.map((entry) => {
+            /* Groups are flattened here rather than collapsed behind another tap. The
+               desktop row groups them because it has run out of horizontal space; a
+               vertical drawer has none of that pressure, so every category stays one
+               tap away and the group label becomes a heading instead of a control.
+               That is also what keeps Hard Tennis Bat reachable on a phone. */
+            if ("items" in entry) {
+              return (
+                <li key={entry.label}>
+                  <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/60">
+                    {entry.label}
+                  </p>
+                  <ul>
+                    {entry.items.map((child) => (
+                      <li key={child.href}>
+                        <Link
+                          href={child.href}
+                          onClick={onClose}
+                          className={cn(drawerLinkClass, drawerLinkPlainClass)}
+                        >
+                          {child.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              );
+            }
+
+            return (
+              <li key={entry.href}>
+                <Link
+                  href={entry.href}
+                  onClick={onClose}
+                  className={cn(
+                    drawerLinkClass,
+                    entry.highlight
+                      ? // Accent colour plus a word, not colour alone: "Repair" tells
+                        // someone scanning the drawer what this item is for, which a
+                        // gold tint on its own cannot.
+                        "font-semibold text-accent hover:bg-accent-muted"
+                      : drawerLinkPlainClass,
+                  )}
+                >
+                  {entry.label}
+                  {entry.highlight && (
+                    <span className="shrink-0 rounded-sm border border-accent/30 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-accent/80">
+                      Repair
+                    </span>
+                  )}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
 
         <div className="border-t border-border p-4">

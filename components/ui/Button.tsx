@@ -35,15 +35,41 @@ const sizeStyles: Record<ButtonSize, string> = {
   lg: "h-12 px-7 text-sm font-semibold tracking-wide",
 };
 
+const baseStyles =
+  "inline-flex items-center justify-center gap-2 rounded-sm font-medium transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
+
+/** The skin a `Button`/`ButtonLink` would wear, without the element.
+ *
+ *  It exists for one case: an element that must not be a `<button>` or a plain `<a>`
+ *  but should be indistinguishable from one. `next/link` is that case — `ButtonLink`
+ *  renders a bare `<a>`, which is right for an external URL and wrong for an internal
+ *  route, where it would cost client-side navigation and prefetch.
+ *
+ *  Before this existed the alternative was copying the strings by hand, and the
+ *  header is the evidence for why that does not hold: the Bat Doctor link carried a
+ *  comment claiming it reproduced `variant="expert"` while actually using `accent`
+ *  tokens, so the two buttons sitting side by side in the same bar were a visibly
+ *  different gold. A caller that asks for `expert` now gets `expert`. */
+export function buttonClass({
+  variant = "primary",
+  size = "md",
+  className,
+}: {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  className?: string;
+} = {}) {
+  return cn(baseStyles, variantStyles[variant], sizeStyles[size], className);
+}
+
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", ...props }, ref) => {
     return (
       <button
         ref={ref}
         className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-sm font-medium transition-colors duration-200",
+          baseStyles,
           "disabled:pointer-events-none disabled:opacity-50",
-          "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest",
           variantStyles[variant],
           sizeStyles[size],
           className,
@@ -69,15 +95,6 @@ export function ButtonLink({
   ...props
 }: ButtonLinkProps) {
   return (
-    <a
-      className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-sm font-medium transition-colors duration-200",
-        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest",
-        variantStyles[variant],
-        sizeStyles[size],
-        className,
-      )}
-      {...props}
-    />
+    <a className={buttonClass({ variant, size, className })} {...props} />
   );
 }

@@ -26,7 +26,16 @@ export default function CustomizePage() {
           description="Add your name to your bat with professional in-house laser engraving before dispatch."
         />
         <div className="relative aspect-[4/3] overflow-hidden rounded-sm border border-border lg:aspect-square">
-          <Image src="/hero/engraving.jpg" alt="" fill className="object-cover" />
+          {/* `fill` with no `sizes` makes Next assume 100vw and ship the largest
+              derivative on every viewport. The real box is a gap-10 half column:
+              (1232 − 40) / 2 = 596px at the container cap. */}
+          <Image
+            src="/hero/engraving.jpg"
+            alt=""
+            fill
+            className="object-cover"
+            sizes="(min-width: 1280px) 596px, (min-width: 1024px) calc(50vw - 2.75rem), calc(100vw - 3rem)"
+          />
         </div>
       </div>
 

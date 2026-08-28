@@ -1,19 +1,25 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MessageCircle } from "lucide-react";
+import { ArrowRight, MessageCircle } from "lucide-react";
 import {
   getAllProductSlugs,
   getProductBySlug,
 } from "@/data/products";
 import { getBrandBySlug } from "@/data/brands";
 import { getCategoryBySlug } from "@/data/categories";
-import { siteConfig } from "@/data/site-config";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import {
+  PRODUCT_HERO_SIZES,
+  ProductImageFrame,
+  ratioForCategory,
+} from "@/components/product/ProductImageFrame";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
-import { ButtonLink } from "@/components/ui/Button";
+import { ButtonLink, buttonClass } from "@/components/ui/Button";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { BatOptionsPicker } from "@/components/product/BatOptionsPicker";
+import { isConfigurableBat } from "@/data/bat-options";
 import { discountPercent, formatPrice } from "@/lib/utils";
 import { buildWhatsAppUrl, whatsappMessages } from "@/lib/whatsapp";
 
@@ -30,9 +36,15 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = getProductBySlug(slug);
   if (!product) return { title: "Product not found" };
 
+  /* Brand-first when there is a brand, product name alone when there is not. The
+     naive template produced "undefined Scoop Cricket Bat" as a page title and
+     "Buy Scoop Cricket Bat by undefined" as its meta description for the
+     unattributed range. */
   return {
-    title: `${product.brandName} ${product.name}`,
-    description: `Buy ${product.name} by ${product.brandName} at Kashmiri Willow Bats.`,
+    title: product.brandName ? `${product.brandName} ${product.name}` : product.name,
+    description: product.brandName
+      ? `Buy ${product.name} by ${product.brandName} at Kashmiri Willow Bats.`
+      : `Buy ${product.name} at Kashmiri Willow Bats.`,
   };
 }
 
@@ -41,12 +53,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product = getProductBySlug(slug);
   if (!product) notFound();
 
-  const brand = getBrandBySlug(product.brandSlug);
+  const brand = product.brandSlug ? getBrandBySlug(product.brandSlug) : undefined;
   const category = getCategoryBySlug(product.categorySlug);
   const discount =
     product.mrp != null ? discountPercent(product.mrp, product.price) : 0;
 
-  const whatsappMessage = `${whatsappMessages.general}\n\nProduct: ${product.brandName} ${product.name}\nPrice: ${formatPrice(product.price)}`;
+  // The name alone identifies an unattributed product. This message is what the
+  // customer sends us, so a stray "undefined" in it would land in a real WhatsApp
+  // thread.
+  const productLine = product.brandName
+    ? `${product.brandName} ${product.name}`
+    : product.name;
+  const whatsappMessage = `${whatsappMessages.general}\n\nProduct: ${productLine}\nPrice: ${formatPrice(product.price)}`;
 
   return (
     <Container className="section-padding">
@@ -64,26 +82,51 @@ export default async function ProductPage({ params }: ProductPageProps) {
       />
 
       <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
-        <div className="studio-bg relative aspect-[4/5] overflow-hidden rounded-sm border border-border">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            loading="eager"
-            fetchPriority="high"
-            className="object-contain p-[12%]"
-            sizes="(max-width: 1024px) 100vw, 50vw"
-          />
-        </div>
+        {/* Same frame as every card, one size up. This was a cream `studio-bg` slab
+            with `object-contain p-[12%]`, which is precisely the case the shared
+            frame exists to fix: seven of eight product images are placeholders drawn
+            on a cream gradient and the eighth is a real studio shot on near-black,
+            so a fixed light background is wrong for the one that matters and a fixed
+            dark one is wrong for the other seven. The frame derives its backdrop from
+            each image instead.
+
+            `alt=""` — the `<h1>` beside it names the product, so a screen reader
+            announcing it again is duplication. `priority` because this is the page's
+            LCP element. `interactive={false}` because there is no card to hover and
+            no link here: a zoom on mouse-over with nothing to click would read as a
+            broken affordance. */}
+        <ProductImageFrame
+          src={product.image}
+          alt=""
+          /* Chosen from the category — see `ratioForCategory`. The card grids keep a
+             single fixed ratio because a row of cards has to align; this hero has no
+             row to align with, so it is free to take the shape of what it is showing. */
+          ratio={ratioForCategory(product.categorySlug)}
+          priority
+          interactive={false}
+          sizes={PRODUCT_HERO_SIZES}
+          /* Capped below `lg`, where this grid is a single column and the frame would
+             otherwise take the full container: at a 731px viewport that was a 668x835
+             card holding a product 308px wide. A bat is a tall, narrow subject and the
+             frame is 4:5, so widening the card cannot fill it — it only grows the
+             surround. From `lg` the grid splits and the column is already the cap, so
+             the limit lifts. */
+          className="product-glass mx-auto w-full max-w-[420px] rounded-xl lg:max-w-none"
+        />
 
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <Link
-              href={`/brands/${product.brandSlug}`}
-              className="text-sm font-semibold text-accent hover:text-accent-hover"
-            >
-              {product.brandName}
-            </Link>
+            {/* Only when there is a brand to link to. Rendered unconditionally this
+                was a gold "undefined" pointing at /brands/undefined — a 404 dressed
+                up as the manufacturer. */}
+            {product.brandSlug && product.brandName && (
+              <Link
+                href={`/brands/${product.brandSlug}`}
+                className="text-sm font-semibold text-accent hover:text-accent-hover"
+              >
+                {product.brandName}
+              </Link>
+            )}
             {product.badge && <Badge variant="forest">{product.badge}</Badge>}
           </div>
 
@@ -119,18 +162,64 @@ export default async function ProductPage({ params }: ProductPageProps) {
             )}
           </div>
 
+          {/* The second and last reader of `isPlaceholder`. It sits between the price
+              and the order buttons on purpose: this is the one screen where someone
+              reads a figure and then acts on it, so the caveat has to arrive before the
+              CTA rather than after it. Worth being blunt in the copy — the price above
+              is an invented development figure, and a page that showed it without
+              saying so would be making a commercial claim on the shop's behalf. */}
+          {product.isPlaceholder && (
+            <p className="mt-4 rounded-lg border border-dashed border-border bg-surface-elevated p-3 text-sm leading-relaxed text-muted-foreground">
+              <span className="font-semibold text-foreground">
+                Placeholder listing.
+              </span>{" "}
+              This product is a development placeholder while we photograph and price
+              the range. The name and figure above are not final — talk to us on
+              WhatsApp for what is actually in stock today.
+            </p>
+          )}
+
           <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
             Inclusive of expert support, safe packaging, and fresh bat preparation
-            where applicable. Online checkout is coming soon — order via WhatsApp
-            today.
+            where applicable. No payment is taken online — you confirm the order with
+            us on WhatsApp.
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          {/* Add to cart leads now, and WhatsApp stays. They are two genuinely
+              different journeys rather than a primary and a fallback: the cart is for
+              someone buying more than one thing, or applying a code at checkout; the
+              direct message is for someone with one bat in mind and a question about
+              it. Neither replaces the other, and both still end in the same WhatsApp
+              thread. */}
+          {/* A bat is configured before it is added; everything else is added as it
+              is. The picker owns its own add button because the spec and the action
+              belong together — splitting them would let someone change a dropdown
+              after pressing add and believe the change was captured. */}
+          {isConfigurableBat(product.categorySlug) ? (
+            <BatOptionsPicker
+              slug={product.slug}
+              name={product.name}
+              price={product.price}
+            />
+          ) : (
+            <AddToCartButton
+              slug={product.slug}
+              name={product.name}
+              size="lg"
+              className={buttonClass({
+                variant: "primary",
+                size: "lg",
+                className: "mt-8 w-full",
+              })}
+            />
+          )}
+
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row">
             <ButtonLink
               href={buildWhatsAppUrl(whatsappMessage)}
               target="_blank"
               rel="noopener noreferrer"
-              variant="primary"
+              variant="outline"
               size="lg"
               className="flex-1"
             >
@@ -149,24 +238,32 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </ButtonLink>
           </div>
 
-          <button
-            type="button"
-            disabled
-            className="mt-3 flex h-12 w-full cursor-not-allowed items-center justify-center rounded-sm border border-border bg-surface-elevated text-sm font-semibold text-muted"
-          >
-            Add to cart — checkout coming soon
-          </button>
 
-          <div className="mt-8 rounded-sm border border-border bg-surface p-5">
-            <h2 className="text-sm font-semibold">Laser name engraving</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {formatPrice(siteConfig.engraving.price)} · Free above{" "}
-              {formatPrice(siteConfig.engraving.freeThreshold)}
-            </p>
-            <p className="mt-2 text-xs text-muted">
-              Engraving options will be selectable here when checkout goes live.
-            </p>
-          </div>
+          {/* §33's second and last cross-site entry point. One line, below the buying
+              decision rather than beside it — someone reading a product page is looking
+              for a new bat, and this is only useful to the fraction of them who came
+              here because their current one is damaged. A quiet row serves those people
+              without arguing with the two buttons above. */}
+          <Link
+            href="/bat-doctor"
+            className="group mt-3 flex items-center justify-between gap-3 rounded-sm border border-accent/25 bg-accent-muted px-5 py-4 transition-colors duration-200 hover:border-accent/50 hover:bg-accent/12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+          >
+            <span>
+              <span className="block text-sm font-semibold text-accent">
+                Need bat repair?
+              </span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                Toe, handle, edge and grain repair by our technicians.
+              </span>
+            </span>
+            <span className="flex shrink-0 items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-accent">
+              Bat Doctor
+              <ArrowRight
+                className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </span>
+          </Link>
         </div>
       </div>
     </Container>

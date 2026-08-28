@@ -8,6 +8,12 @@ interface SectionHeadingProps {
   align?: "left" | "center";
   className?: string;
   dark?: boolean;
+  /**
+   * Applied to the `<h2>`. Sections that label themselves with
+   * `aria-labelledby` must pass this, or the reference dangles and the
+   * section ends up with no accessible name at all.
+   */
+  titleId?: string;
 }
 
 export function SectionHeading({
@@ -17,6 +23,7 @@ export function SectionHeading({
   align = "left",
   className,
   dark = false,
+  titleId,
 }: SectionHeadingProps) {
   return (
     <FadeIn
@@ -28,6 +35,7 @@ export function SectionHeading({
     >
       {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
       <h2
+        id={titleId}
         className={cn(
           "heading-lg",
           dark ? "text-white" : "text-foreground",

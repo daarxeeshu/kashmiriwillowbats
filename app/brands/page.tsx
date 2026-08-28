@@ -19,12 +19,20 @@ export default function BrandsPage() {
         className="mt-6"
         eyebrow="Multi-brand store"
         title="Our brands"
-        description="One store featuring established cricket brands from Kashmir — authentic equipment, expert support, and reliable shipping."
+        description="Kashmir Valley's top cricket brands brought together in one destination. Every maker listed here is an independent manufacturer based in the Valley, and we buy from them directly — compare their bats side by side instead of guessing from a marketplace listing."
       />
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {brands.map((brand) => (
-          <BrandCard key={brand.id} brand={brand} className="w-full" />
+        {brands.map((brand, i) => (
+          <BrandCard
+            key={brand.id}
+            brand={brand}
+            index={i}
+            className="w-full"
+            /* The first cover is this page's LCP element, so preload it
+               instead of letting it lazy-load. */
+            priority={i === 0}
+          />
         ))}
       </div>
     </Container>

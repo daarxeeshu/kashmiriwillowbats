@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+/* ── `no-hover:` — true on a device that cannot hover ──
+   Tailwind v4 already wraps its own `hover:` and `group-hover:` in
+   `@media (hover: hover)`, so a hover rule never misfires on a touch screen. What
+   it has no variant for is the other half of that: the *base* state a touch screen
+   is left sitting in. `opacity-0 group-hover:opacity-100` is the pattern this
+   codebase used for card actions, and on a phone the hover half simply never runs,
+   so the control stays at `opacity: 0` — present in the DOM, still in the tab
+   order, and invisible.
+
+   This is the escape hatch. Gated on input capability rather than width because
+   width is the wrong question: a touch laptop at 1440px cannot hover, and a
+   mouse-driven 380px window can. Used by ProductCard. */
+@custom-variant no-hover (@media (hover: none));
+
 /* ── Design tokens ── */
 @theme {
   --color-background:       #0e0d0b;
@@ -33,6 +47,31 @@
   --color-expert-muted:     rgba(216, 180, 106, 0.12);
 
   --color-success:          #6bbf8a;
+
+  /* Damage / error. Added for Bat Doctor, which needs a red for two different jobs
+     the brief keeps separate: marking a *damaged* region on a bat, and marking an
+     *invalid* field in the repair form. Same hue for both because they mean the same
+     thing to the eye — something here needs attention — and desaturated to sit inside
+     a warm gold-on-charcoal palette rather than shout over it. A stock #ef4444 next
+     to #9a7b4f reads as a browser validation bubble dropped onto the page. */
+  --color-danger:           #c9564a;
+  --color-danger-muted:     rgba(201, 86, 74, 0.12);
+}
+
+/* ── Layout metrics ──
+   `Header` already reads --header-height, but nothing ever defined it, so
+   `h-[var(--header-height)]` was an invalid length and the bar silently
+   collapsed to its 40px content height — exactly the height of the h-10 icon
+   buttons inside it, leaving them no breathing room. Declared here rather than
+   in @theme: this is a raw var() lookup, not a utility namespace. */
+:root {
+  --header-height: 64px;
+  /* Same defect as above, one component over: `AnnouncementBar` sizes its inner
+     row with h-[var(--announcement-height)] and nothing declared it, so the bar
+     collapsed to text height. It is also the offset the hero measures against
+     to fill the viewport below the chrome, which is why it has to be a real
+     number rather than left to content. */
+  --announcement-height: 36px;
 }
 
 /* ── Force critical position utilities (Tailwind v4 fix) ── */
@@ -93,8 +132,14 @@
 
 /* ── Typography ── */
 @layer components {
+  /* 0.75rem = 12px, the readability floor. This was 0.6875rem (11px), and raising
+     the token is what makes the fix a fix rather than a patch: eight section kickers
+     across the page inherit from here, so the alternative was eight edits that would
+     drift apart. Three components hand-rolled this same rule as
+     `text-[11px] font-semibold uppercase tracking-[0.14em]` instead of using the
+     class — those are raised alongside it, and would be better off using it. */
   .eyebrow {
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -122,7 +167,630 @@
   }
 }
 
-/* ── Brand card entrance animation ── */
+/* ── Product card: liquid glass ───────────────────────────────────────────────────
+   The card surface for every product in the app. Deliberately shares the visual
+   language of `.hero-glass` below — same construction, same three stacked effects —
+   because a product card and a hero panel appearing on the same page in two
+   different dialects of glass is what makes a site look assembled rather than
+   designed. The white values here are raised from the hero's: a hero panel floats
+   over a lit stage and only has to be *seen*, while a card has to carry ~12px text
+   at the bottom of a long dark page and be legible doing it.
+
+   Note what is NOT here: `backdrop-filter`. There is nothing behind a card but the
+   flat page background, so a blur would cost GPU and render identically. Blur is
+   applied where it actually refracts something — the floating action buttons and
+   the badge, which sit over the product photograph and its ambient wash. The glass
+   read comes from the gradient, the hairlines and the shadow, all of which work
+   over a flat backdrop. */
+@layer components {
+  .product-glass {
+    position: relative;
+    /* Off-axis so the light has a direction. Brightest at the top-left corner,
+       dipping through the middle, lifting again at the bottom-right — the falloff
+       of a single source raking across a slab, which is what stops a translucent
+       fill from reading as flat grey paint. */
+    background: linear-gradient(
+      148deg,
+      rgba(255, 255, 255, 0.13) 0%,
+      rgba(255, 255, 255, 0.055) 46%,
+      rgba(255, 255, 255, 0.095) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    /* The inset top hairline is the entire illusion of thickness — it reads as the
+       lit top edge of a pane with real depth. The bottom inset is its far side,
+       kept dimmer. The outer shadow is what lifts the slab off the page. */
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.28),
+      inset 0 -1px 0 0 rgba(255, 255, 255, 0.06),
+      0 16px 36px -18px rgba(0, 0, 0, 0.7);
+    transition:
+      transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 300ms ease;
+  }
+
+  /* Specular sweep, as a separate layer for the same reason `.hero-glass` needs
+     one: it has to sit above the panel's own background but below its content, and
+     it travels on hover independently of the slab. A highlight that moves further
+     than the object it sits on is what the eye reads as a reflection of the room
+     rather than a gradient printed on the surface. */
+  .product-glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    /* Above the photograph, below the text. The card's info panel and its floating
+       controls opt above this with `z-[2]`; the image frame stays at `auto` and so
+       paints beneath. A highlight travelling over the product reads as glass; the
+       same highlight travelling over 12px type just lowers its contrast. */
+    z-index: 1;
+    background: linear-gradient(
+      112deg,
+      transparent 26%,
+      rgba(255, 255, 255, 0.12) 45%,
+      rgba(255, 255, 255, 0.02) 57%,
+      transparent 70%
+    );
+    opacity: 0.7;
+    transition:
+      transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 300ms ease;
+  }
+
+  /* Hover is wrapped by hand rather than using Tailwind's `hover:` because these
+     are plain CSS rules, and an unguarded `:hover` on a touch screen sticks after
+     a tap — the card would stay lifted until something else was tapped. Same
+     capability gate the `no-hover:` variant at the top of this file is built on. */
+  @media (hover: hover) {
+    .product-glass:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.26);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.36),
+        inset 0 -1px 0 0 rgba(255, 255, 255, 0.08),
+        0 28px 56px -20px rgba(0, 0, 0, 0.82);
+    }
+
+    /* Travels ~18% of the card while the card itself moves 4px. */
+    .product-glass:hover::after {
+      transform: translateX(18%);
+      opacity: 0.95;
+    }
+  }
+
+  /* The plinth the product stands on: a soft elliptical pool under the bat, so the
+     product reads as resting on a surface instead of floating in a rectangle. Part
+     of the same job as the ambient wash — dissolving the hard edge of the image
+     box — and the reason it is CSS rather than baked into the photography is that
+     it then works for all eight products and every one added later. */
+  .product-plinth {
+    background: radial-gradient(
+      58% 42% at 50% 100%,
+      rgba(0, 0, 0, 0.5) 0%,
+      rgba(0, 0, 0, 0.22) 45%,
+      transparent 78%
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-glass,
+  .product-glass::after {
+    transition: none;
+  }
+
+  .product-glass:hover {
+    transform: none;
+  }
+
+  .product-glass:hover::after {
+    transform: none;
+  }
+}
+
+/* ── Cinematic hero: stage, glass, atmosphere ─────────────────────────────────
+   Everything below serves components/hero/. It is CSS rather than props because
+   none of it changes per frame — the scroll sequence animates transforms and
+   opacity through framer-motion MotionValues, and these are the static surfaces
+   those transforms move around. Keeping blur, borders and grain out of the JS
+   path is what lets the whole sequence stay on the compositor. */
+
+:root {
+  /* Sampled from the reference sequence rather than invented. The corners hold
+     near-black with a faint cool cast for the whole run (#070709..#0d0d0f); only
+     the centre changes, warming to #5f5343 as the final composition settles. */
+  --hero-void: #07080a;
+  --hero-void-lift: #0d0f12;
+  --hero-warm: #5f5343;
+  --hero-rim: rgba(255, 246, 232, 0.9);
+}
+
+@layer components {
+  /* Liquid glass. One class, three stacked effects:
+       background   a dark translucent wash, so it reads as smoked glass over a
+                    near-black stage rather than as frosted white
+       backdrop     12px blur — inside the 8–16px band where the bat behind stays
+                    recognisable but unreadable. Past ~20px the panel turns into
+                    a flat grey rectangle and stops being glass
+       box-shadow   an inset hairline along the top edge is the whole illusion of
+                    thickness; the outer shadow lifts the panel off the stage */
+  .hero-glass {
+    position: relative;
+    background: linear-gradient(
+      148deg,
+      rgba(255, 255, 255, 0.11) 0%,
+      rgba(255, 255, 255, 0.045) 42%,
+      rgba(255, 255, 255, 0.07) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(12px) saturate(1.15);
+    backdrop-filter: blur(12px) saturate(1.15);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
+      inset 0 -1px 0 0 rgba(255, 255, 255, 0.05),
+      0 18px 40px -18px rgba(0, 0, 0, 0.75);
+  }
+
+  /* Specular sweep. A separate layer because it has to sit above the panel's own
+     background but below its text, and because tilting the card on hover moves
+     this independently of the panel — which is what makes the highlight read as
+     a reflection travelling across glass instead of a gradient painted on it. */
+  .hero-glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      112deg,
+      transparent 28%,
+      rgba(255, 255, 255, 0.13) 46%,
+      rgba(255, 255, 255, 0.02) 58%,
+      transparent 72%
+    );
+    opacity: 0.85;
+  }
+
+  /* The tall slab the bat stands in front of from phase 02 onward. Far weaker
+     than .hero-glass — it is a pane of studio glass catching light, and at panel
+     opacity it would wash out the product it sits behind.
+
+     No border and no inset hairline, unlike .hero-glass. A 1px outline round a
+     78%-tall rectangle is four hard edges drawn across the stage, and the bottom
+     one in particular read as a stray horizontal rule under the bat for the whole
+     time the slab was up. The radial mask replaces them: the layer falls off into
+     the void instead of ending, which is both what a pane lit from one side looks
+     like and what keeps the 5px backdrop blur from having a visible seam the
+     product can cross. */
+  .hero-slab {
+    background: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.055) 0%,
+      rgba(255, 255, 255, 0.015) 55%,
+      rgba(255, 255, 255, 0.04) 100%
+    );
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    -webkit-mask-image: radial-gradient(
+      70% 58% at 50% 42%,
+      #000 0%,
+      rgba(0, 0, 0, 0.7) 52%,
+      transparent 100%
+    );
+    mask-image: radial-gradient(
+      70% 58% at 50% 42%,
+      #000 0%,
+      rgba(0, 0, 0, 0.7) 52%,
+      transparent 100%
+    );
+  }
+
+  /* The invisible tripwire that hands the site header its glass, positioned in
+     CSS because it has to be a fraction of a track whose length differs per
+     breakpoint — 280svh on desktop, 180svh on mobile.
+
+     88% of the scrollable part of the section, at both. `100%` is the section, so
+     `100% - 100svh` is its travel, and 0.88 of that lands in the closing fifth of
+     either camera move: the brief's "reveal the floating nav in the final 20%".
+     Before mobile had a track this collapsed to zero and needed a flat 55svh
+     fallback; now it resolves to 70.4svh there and the fallback is gone. */
+  .hero-mark {
+    top: calc(0.88 * (100% - 100svh));
+  }
+}
+
+@layer utilities {
+  /* Base stage tone. Two offset radials over near-black: a cool lift behind the
+     product and a wide cool haze above it. Deliberately not a linear gradient —
+     a linear ramp reads as a backdrop, radials read as light falling into a
+     room, which is the "dark studio" the brief asks for. */
+  .hero-void {
+    background-color: var(--hero-void);
+    background-image:
+      radial-gradient(
+        68% 52% at 56% 42%,
+        var(--hero-void-lift) 0%,
+        transparent 100%
+      ),
+      radial-gradient(
+        120% 80% at 50% -10%,
+        rgba(120, 140, 165, 0.07) 0%,
+        transparent 60%
+      );
+  }
+
+  /* Warm studio light for the closing composition, cross-faded over .hero-void.
+     Its own element so opacity is the only animated property. */
+  .hero-warmth {
+    background-image:
+      radial-gradient(
+        58% 46% at 62% 58%,
+        rgba(150, 116, 74, 0.5) 0%,
+        rgba(95, 83, 67, 0.22) 45%,
+        transparent 100%
+      ),
+      radial-gradient(
+        40% 30% at 40% 88%,
+        rgba(120, 92, 60, 0.28) 0%,
+        transparent 100%
+      );
+  }
+
+  /* Corner falloff, always on. Keeps the frame from reading as a flat rectangle
+     and stops the warm glow from reaching the edges, which is what separates a
+     lit studio from a coloured background. */
+  .hero-vignette {
+    background-image: radial-gradient(
+      82% 70% at 52% 48%,
+      transparent 42%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+  }
+
+  /* Film grain. Static, not animated: a moving grain draws the eye at exactly
+     the moment the product should hold it, and repainting a full-viewport noise
+     layer every frame is the most expensive thing on the page. Its real job is
+     to break up the smooth gradients above, which band badly on 8-bit panels,
+     and to sit over the bat during the macro push where the source render is
+     scaled past its native resolution. */
+  .hero-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 160px 160px;
+  }
+}
+
+/* Idle drift for the atmosphere. Scroll parallax is applied by the component on
+   a parent element, so these two compose: the particle field slides with the
+   camera while each mote also breathes on its own clock. Long, prime-ish
+   durations keep the layers from visibly resynchronising. */
+@keyframes heroDrift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(1.1vw, -1.7vh, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes heroTwinkle {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: scale(0.82);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+}
+
+/* The bat's idle breath. Percentages, not pixels, so it stays proportional to the
+   product at every camera distance — and it lives on its own element because the
+   scroll transforms are written inline, and an inline transform would silently
+   win over this animation if they shared one. */
+@keyframes heroFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0.6%, 0) rotate(-0.22deg);
+  }
+  50% {
+    transform: translate3d(0, -0.8%, 0) rotate(0.22deg);
+  }
+}
+
+.animate-hero-drift {
+  animation: heroDrift 23s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  will-change: transform;
+}
+
+.animate-hero-twinkle {
+  animation: heroTwinkle 6.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.animate-hero-float {
+  animation: heroFloat 9.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  will-change: transform;
+}
+
+/* ── Mobile hero entrance ──────────────────────────────────────────────────────
+   The ≤767px hero has no scroll-driven opacity at all — its content is at full
+   strength the moment it paints — so this is the only thing that fades it in, and
+   it runs once on load.
+
+   Deliberately CSS rather than framer-motion `initial`/`animate`. Those are driven
+   by requestAnimationFrame, and an element left at `initial` when rAF does not
+   tick — a restored page, a backgrounded tab, iOS during momentum scroll — is
+   invisible with no way back.
+
+   And note what is *not* here: none of these rules sets a resting `opacity: 0`.
+   That is the same trap one layer down. `opacity: 0` plus an animation means the
+   declared state of the element is invisible and only a running animation makes it
+   otherwise, so a stalled animation is indistinguishable from the bug this hero
+   was just fixed for. Instead the resting state is the visible one and the
+   keyframes reach *back* to invisible from there — `forwards` fill, never
+   `backwards` or `both`, and no delay on the rule that touches opacity. Worst
+   case the entrance is skipped. It cannot be the reason nothing is on screen. */
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* One fade for the whole column, on the wrapper, with no delay — a delay plus
+   forwards-only fill would show the content, blink it out when the animation
+   started, and fade it back. */
+.hero-fade-in {
+  animation: heroFadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* The stagger is transform-only, which is what makes it safe to delay: an element
+   whose rise never runs is fifteen pixels low, not missing. */
+@keyframes heroInRise {
+  from {
+    transform: translate3d(0, 15px, 0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.hero-in {
+  animation: heroInRise 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* The product rises further and slower than the type, and — like everything else
+   here — never has its opacity touched. It is the one element on the page whose
+   visibility must not depend on an animation running at all. */
+@keyframes heroBatRise {
+  from {
+    transform: translate3d(0, 3.5svh, 0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.hero-bat-in {
+  animation: heroBatRise 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* The mobile bat's lean, and the only reason it is in CSS rather than a utility
+   class is that it has to respond to viewport *height*.
+
+   bat.png is 431x1526 — 1:3.54 — so on a phone the bat's width is set entirely by
+   how much vertical room is left after the headline and the two buttons, and the
+   brief asks for 55–75vw. Tilting is what converts spare length into width: at
+   angle t a bat of length h occupies h(0.2824·cos t + sin t) across and
+   h(cos t + 0.2824·sin t) down, so 17° turns a 430px-tall band into a 59vw
+   footprint on a 390x844 screen.
+
+   Each step down is a shorter band, and the lean grows to keep the width in range:
+
+     > 760px tall   17°,  95% of the band  →  57–59vw on the three target sizes
+     700–760px      30°,  95%              →  ~55vw
+     620–700px      38°, 105%              →  61–63vw at 360x640 and 375x667
+     < 620px        48°, 114%              →  55vw at 320x568
+
+   That last step is the extreme case — a 568px screen leaves a 167px band, where
+   an upright bat is a 37vw splinter with half the stage empty around it. At 48° the
+   bounding box is 0.879h tall, so 114% of the band lands the box back inside it
+   exactly while the width comes out at 55vw. Nothing here crops the bat; see the
+   note in the implementation report about why a whole 1:3.54 product cannot be both
+   55vw wide and above the fold on a short screen without leaning. */
+.hero-bat-tilt {
+  transform: rotate(-17deg);
+}
+
+@media (max-height: 760px) {
+  .hero-bat-tilt {
+    transform: rotate(-30deg);
+  }
+}
+
+/* Height as well as angle from here down, and it overrides the `h-[95%]` utility on
+   the element because this block is unlayered — unlayered CSS outranks every @layer,
+   including Tailwind's utilities. Over 100% because past ~35° the bounding box is
+   shorter than the bat, so filling the band means overshooting its own height.
+
+   The overshoot then has to be re-centred, and that is what the translate is for.
+   These rules make the img taller than the band it sits in, and an img is a block in
+   a column of `h-full` wrappers, so the extra length is added at the bottom only: the
+   element's centre — which is also its rotation origin — ends up (H-100)/2 of the band
+   below the band's own centre, and the rotated box hangs off the bottom edge by that
+   much. At the 48° rung that is 11px on a 168px band, and it was the whole of that
+   viewport's 2px resting gap to SHOP NOW: 11px of bat overhanging a band that had 11px
+   of unused room directly above it. So each rule gives back half of what its height
+   added, in units of the element's own height rather than the band's, because that is
+   what a percentage translate resolves against — 5/(2·105) and 14/(2·114). This is
+   what the note above means by "lands the box back inside it"; until now that was only
+   true of the box's size, not its position.
+
+   Deliberately not applied to the two rules above, where the img is *shorter* than its
+   band and the same correction would push the box down instead. They have slack under
+   the bat and none over it — the support line is immediately above — so leaving them
+   top-aligned is the safe asymmetry, and both measure clean that way. */
+@media (max-height: 700px) {
+  .hero-bat-tilt {
+    height: 105%;
+    transform: translateY(-2.38%) rotate(-38deg);
+  }
+}
+
+@media (max-height: 620px) {
+  .hero-bat-tilt {
+    height: 114%;
+    transform: translateY(-6.14%) rotate(-48deg);
+  }
+}
+
+/* The tablet-only nudge that moves the whole desktop product group right.
+ *
+ * At `lg` and above the camera table's own BAT_X does all the composing and this is
+ * zero, so the desktop design is untouched. Between 768 and 1023 the frame is
+ * narrow, the type column reaches nearly to the middle, and the bat needs 7vw more
+ * clearance — but the bat's wrapper was the only layer that knew about it, so at
+ * 768 the bat walked out from under its own contact shadow and straight over the
+ * cricket ball, which was pinned to the stage at a flat 72%. Measured at 768x1024
+ * before this: bat 54..82%, shadow 48..74%, ball 72..78% — the ball sitting on the
+ * blade, the shadow 54px to the left of the thing casting it.
+ *
+ * One variable, three consumers, so the group cannot drift apart again. */
+[data-hero-sequence] {
+  --hero-bat-shift: 0px;
+}
+
+@media (max-width: 1023px) {
+  [data-hero-sequence] {
+    --hero-bat-shift: 7vw;
+  }
+}
+
+/* The desktop product's opening fade, replacing a framer-motion `initial`/`animate`
+   pair that left the bat at opacity 0 whenever requestAnimationFrame was not being
+   serviced. Opacity only: the element it sits on carries the camera transform
+   inline, and no resting opacity, for the reason above. */
+.hero-reveal {
+  animation: heroFadeIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-fade-in,
+  .hero-in,
+  .hero-bat-in,
+  .hero-reveal {
+    animation: none;
+  }
+}
+
+/* ── Site chrome over the hero ─────────────────────────────────────────────────
+   The announcement bar and header sit above the hero in the document, and the
+   hero is pulled up underneath them with a negative margin, so they float over
+   the stage. These rules strip their surfaces while the sequence runs and give
+   the header glass once it settles — which is the brief's "reveal a floating
+   nav at the final hero state" done with the real navigation instead of a second
+   one built from links this site does not have.
+
+   Unlayered on purpose. Tailwind's utilities live in @layer utilities, and any
+   layered rule loses to them no matter its specificity; unlayered CSS outranks
+   every layer. `[data-hero-stage]` is set by HeroSequence and only exists on
+   pages that render it, so every other route is untouched.
+
+   Nothing here hides anything — a header at opacity 0 is still focusable, which
+   is a genuine keyboard trap. It goes transparent and quiet instead. */
+html[data-hero-stage] .site-announcement,
+html[data-hero-stage] .site-header {
+  background-color: transparent;
+  border-bottom-color: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition:
+    background-color 0.6s ease,
+    border-color 0.6s ease,
+    opacity 0.6s ease,
+    -webkit-backdrop-filter 0.6s ease,
+    backdrop-filter 0.6s ease;
+}
+
+html[data-hero-stage="active"] .site-announcement {
+  opacity: 0.4;
+}
+
+html[data-hero-stage="settled"] .site-header {
+  background-color: rgba(11, 10, 9, 0.62);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-hero-stage] .site-announcement,
+  html[data-hero-stage] .site-header {
+    transition: none;
+  }
+}
+
+/* ── The bat-expert button and the mobile hero want the same corner ──
+   On a phone the hero parks SHOP NOW and EXPLORE against the bottom edge at the
+   full width of the container, so a bottom-right floating button lands directly
+   on top of EXPLORE — measured at 50x45px of overlap at 375x844, and the button
+   wins the hit test at z-40, so the right end of EXPLORE opened WhatsApp.
+
+   Moving the button permanently would cost more than it saves: clearing the CTA
+   stack means sitting ~143px off the bottom, a third of the way up the screen,
+   for the whole document. So it waits for the hero instead. `active` means the
+   stage still owns the viewport; `settled` means those CTAs have scrolled away
+   and the corner is free. Desktop centres its CTAs mid-stage and never collides,
+   which is why this stops at the same `md` boundary the two heroes split on.
+
+   `visibility`, not `opacity` alone: an invisible button that still takes focus
+   and still answers taps is exactly the trap the hand-off above is careful about.
+   Only the home page sets `data-hero-stage`, so every other route is untouched. */
+.site-fab {
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease,
+    visibility 0.4s ease;
+}
+
+@media (max-width: 767px) {
+  html[data-hero-stage="active"] .site-fab {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(0.75rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-fab {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The sequence itself collapses to its final composition in the component —
+     this only stops the ambient loops, which would otherwise keep moving after
+     the scroll animation has been switched off. */
+  .animate-hero-drift,
+  .animate-hero-twinkle,
+  .animate-hero-float {
+    animation: none;
+  }
+
+  .animate-hero-twinkle {
+    opacity: 0.55;
+  }
+}
+
+
 @keyframes brandCardIn {
   from {
     opacity: 0;
@@ -172,14 +840,278 @@
   animation: scrollCue 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
+/* ── Coverflow caption crossfade ──
+   The caption is keyed on the selected index, so it remounts on every change
+   and needs an animation rather than a transition to fade in. */
+@keyframes coverflowCaption {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-coverflow-caption {
+  animation: coverflowCaption 0.3s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-scroll-cue,
   .animate-brand-card-in,
-  .brand-card-animate {
+  .brand-card-animate,
+  .animate-coverflow-caption {
     animation: none;
   }
 
   .brand-card-animate {
     opacity: 1;
+  }
+}
+
+/* ── Bat Doctor ────────────────────────────────────────────────────────────────────
+   A service, not a product, so it gets its own three surfaces rather than borrowing
+   `.product-glass` — which carries a hover lift that is right for something clickable
+   in a grid and wrong for a form panel that just sits there. Everything below is
+   built from the same tokens as the rest of the site: charcoal surfaces, one warm
+   gold, and the new desaturated red for damage.
+
+   These are CSS classes rather than Tailwind utility strings for the usual reason:
+   each is used by six to twenty elements across the feature, and a twelve-declaration
+   box shadow copy-pasted twenty times is twenty places for it to drift. */
+
+@layer components {
+  /* The standing panel: sections, cards, the form's step container. Weaker than
+     `.product-glass` because a panel the size of a form step at card opacity turns
+     into a lit slab and the page stops reading as a dark studio. */
+  .bd-panel {
+    position: relative;
+    background: linear-gradient(
+      152deg,
+      rgba(255, 255, 255, 0.055) 0%,
+      rgba(255, 255, 255, 0.018) 48%,
+      rgba(255, 255, 255, 0.042) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.11),
+      0 20px 44px -26px rgba(0, 0, 0, 0.8);
+  }
+
+  /* The selectable card at rest. Same family as `.bd-panel`, one step darker, because
+     a card that starts bright has nowhere to go when it is selected. */
+  .bd-card {
+    position: relative;
+    background: linear-gradient(
+      152deg,
+      rgba(255, 255, 255, 0.045) 0%,
+      rgba(255, 255, 255, 0.012) 52%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+      0 14px 32px -22px rgba(0, 0, 0, 0.75);
+    transition:
+      border-color 220ms ease,
+      box-shadow 220ms ease,
+      background 220ms ease,
+      transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (hover: hover) {
+    .bd-card:hover {
+      border-color: rgba(255, 255, 255, 0.16);
+      transform: translateY(-2px);
+    }
+  }
+
+  /* Selected. §8 asks for a gold border and a subtle glow, and "subtle" is doing real
+     work here: a 6-card grid with three selected is three glows at once, so the outer
+     spread is kept to a single soft ring rather than the bloom a single hero element
+     could carry. The inset top hairline brightens too — that is what makes the card
+     read as *lit* rather than merely outlined. */
+  .bd-card-selected {
+    background: linear-gradient(
+      152deg,
+      rgba(154, 123, 79, 0.16) 0%,
+      rgba(154, 123, 79, 0.05) 52%,
+      rgba(154, 123, 79, 0.12) 100%
+    );
+    border-color: rgba(216, 180, 106, 0.55);
+    box-shadow:
+      inset 0 1px 0 0 rgba(216, 180, 106, 0.32),
+      0 0 0 1px rgba(216, 180, 106, 0.14),
+      0 18px 40px -24px rgba(154, 123, 79, 0.55);
+  }
+
+  /* The hairline rule used as a section divider and under the nav's active item. Fades
+     at both ends so it reads as light catching an edge instead of a drawn line. */
+  .bd-rule {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(216, 180, 106, 0.45) 50%,
+      transparent 100%
+    );
+  }
+}
+
+@layer utilities {
+  /* The stage the hero and the diagnosis bat stand on. Two radials over near-black,
+     the same construction as `.hero-void` but warmed toward gold rather than cooled —
+     Bat Doctor is a workshop under a lamp, not a product studio. */
+  .bd-stage {
+    background-color: #0a0908;
+    background-image:
+      radial-gradient(
+        62% 48% at 50% 34%,
+        rgba(154, 123, 79, 0.16) 0%,
+        transparent 100%
+      ),
+      radial-gradient(
+        90% 60% at 50% 108%,
+        rgba(120, 92, 60, 0.14) 0%,
+        transparent 100%
+      );
+  }
+
+  /* The damaged half of the hero's split. There is no damaged-bat photography in this
+     project and inventing one is not an option, so the same `bat.png` cutout is shown
+     twice and this is what separates them: the willow is drained of warmth, dropped in
+     value and cooled, which is what neglected, un-oiled, water-marked willow actually
+     looks like next to a restored blade. Honest with the asset we have, and it costs
+     no bytes. */
+  .bd-bat-damaged {
+    filter: grayscale(0.62) brightness(0.62) contrast(1.14)
+      sepia(0.14) hue-rotate(-8deg);
+  }
+
+  /* The restored half — lifted rather than recoloured, so the pair reads as one bat
+     photographed under two conditions instead of two different bats. */
+  .bd-bat-restored {
+    filter: brightness(1.06) saturate(1.1) contrast(1.03);
+  }
+}
+
+/* The diagnosis hotspot's resting pulse (§10 "use subtle animation"). Scale and
+   opacity on a pseudo-ring, never on the dot itself, so the tap target never moves
+   under a finger mid-press. */
+@keyframes bdPulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+.bd-pulse::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1px solid rgba(216, 180, 106, 0.7);
+  animation: bdPulse 2.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bd-card,
+  .bd-card:hover {
+    transition: none;
+    transform: none;
+  }
+
+  .bd-pulse::before {
+    animation: none;
+    opacity: 0.4;
+  }
+}
+
+/* ── Scroll reveal (FadeIn / StaggerGrid / StaggerItem) ────────────────────────
+   Compositor-only: the hidden state is a class the observer removes, and the
+   transition needs no JavaScript frame loop — which is the whole point. iOS Safari
+   pauses requestAnimationFrame during momentum scrolling, and the framer-motion
+   version of these wrappers left every section it had hidden stuck at opacity 0 on
+   a real iPhone. See components/ui/FadeIn.tsx for the other half.
+
+   The visible state carries the transition; the hidden state is inert. So hiding
+   (a pre-paint layout effect) is instant, and only the reveal animates. */
+.reveal {
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+.reveal-hidden {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: none;
+}
+
+/* direction="none": fade without the rise. */
+.reveal-flat.reveal-hidden {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    transition-duration: 0s;
+    transition-delay: 0s;
+  }
+}
+
+/* ── Bat Doctor: selected-region highlight ─────────────────────────────────────
+   A soft inspection light over the part of the bat a selected region names, so
+   "TOE" is shown as well as said. Paired with `area` in data/bat-doctor.ts, whose
+   coordinates come from the bat asset's own alpha channel.
+
+   Deliberately a radial gradient with no hard edge: the measured areas are honest
+   about which part of the bat they cover but not pixel-exact outlines, and a soft
+   glow reads as "this area" while a crisp border would claim a precision the
+   shape does not have. The faint ring gives it just enough definition to be
+   deliberate rather than a smudge.
+
+   Only opacity and transform animate, so this composites and cannot cost layout
+   during the fade. */
+.bd-region {
+  transform: translateZ(0) scale(0.94);
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(216, 180, 106, 0.34) 0%,
+    rgba(216, 180, 106, 0.16) 45%,
+    rgba(216, 180, 106, 0) 72%
+  );
+  box-shadow: inset 0 0 0 1px rgba(216, 180, 106, 0.18);
+  transition:
+    opacity 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.bd-region-off {
+  opacity: 0;
+}
+
+.bd-region-on {
+  opacity: 1;
+  transform: translateZ(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bd-region {
+    transition-duration: 0s;
+    transform: none;
+  }
+  .bd-region-on {
+    transform: none;
   }
 }
