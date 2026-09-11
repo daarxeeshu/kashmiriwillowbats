@@ -1,0 +1,92 @@
+/* ── ElectricBorder ─────────────────────────────────────────────────────────────
+ *
+ * Component inspired by @BalintFerenczy on X
+ * https://codepen.io/BalintFerenczy/pen/KwdoyEN
+ * Adapted from the React Bits `ElectricBorder` (reactbits.dev).
+ *
+ * ── One change from the original stylesheet, and why ──
+ * The source used `oklch(from var(--electric-border-color) l c h / 0.6)` — CSS
+ * relative colour — to derive the translucent glow. Two problems with that here:
+ * `oklch(from …)` needs Chrome 119 / Safari 16.4 / Firefox 128, and when a browser
+ * does not understand it the declaration is simply *invalid* — the border goes
+ * transparent and the glow disappears with nothing to indicate why.
+ *
+ * `color-mix()` does the same job with materially wider support (Chrome 111,
+ * Safari 16.2, Firefox 113), and the plain-colour declaration above each one is the
+ * fallback anything older lands on. So the worst case is a glow that is less subtle
+ * rather than a border that is not there.
+ */
+
+.electric-border {
+  position: relative;
+  border-radius: inherit;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.eb-canvas-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.eb-canvas {
+  display: block;
+}
+
+.eb-content {
+  position: relative;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+.eb-layers {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.eb-glow-1,
+.eb-glow-2,
+.eb-background-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.eb-glow-1 {
+  border: var(--electric-border-thickness, 2px) solid var(--electric-border-color);
+  border-color: color-mix(in oklab, var(--electric-border-color) 60%, transparent);
+  filter: blur(1px);
+}
+
+.eb-glow-2 {
+  border: var(--electric-border-thickness, 2px) solid var(--electric-border-color);
+  filter: blur(4px);
+}
+
+.eb-background-glow {
+  z-index: -1;
+  transform: scale(1.1);
+  filter: blur(32px);
+  opacity: 0.3;
+  background: linear-gradient(
+    -30deg,
+    var(--electric-border-color),
+    transparent,
+    var(--electric-border-color)
+  );
+}
+
+/* The canvas stops animating for a viewer who has asked for less motion — see the
+ * component — but the two blurred borders are static anyway, so the frame still
+ * reads as an electric edge rather than vanishing. Nothing to disable here; this
+ * block exists to say so, because "no reduced-motion rule" and "reduced motion was
+ * considered" look identical in a stylesheet otherwise. */

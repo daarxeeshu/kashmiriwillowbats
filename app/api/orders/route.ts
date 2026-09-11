@@ -9,6 +9,8 @@ import { resolveCart } from "@/lib/cart/totals";
 import { engravingError, normaliseEngraving } from "@/data/bat-options";
 import { applyCoupon } from "@/lib/orders/coupon";
 import { buildOrder, createOrderId, persistOrder } from "@/lib/orders/order";
+import { assertOrderStoreIsDurable } from "@/lib/orders/store";
+import { clientKey, isRateLimited } from "@/lib/db/rate-limit";
 import { hasErrors, validateCheckout } from "@/lib/orders/validate";
 
 /* ── POST /api/orders ─────────────────────────────────────────────────────────────
@@ -33,32 +35,14 @@ const MAX_BODY_BYTES = 32 * 1024;
 /** A cart with more distinct products than this is not a person shopping. */
 const MAX_LINES = 50;
 
-const RATE_WINDOW_MS = 10 * 60 * 1000;
-const RATE_MAX = 12;
-const hits = new Map<string, number[]>();
+/* Rate limiting moved to `lib/db/rate-limit.ts`.
 
-function rateLimited(key: string): boolean {
-  const now = Date.now();
-  const recent = (hits.get(key) ?? []).filter((t) => now - t < RATE_WINDOW_MS);
-  if (recent.length >= RATE_MAX) {
-    hits.set(key, recent);
-    return true;
-  }
-  recent.push(now);
-  hits.set(key, recent);
-  if (hits.size > 5000) {
-    for (const [k, v] of hits) {
-      if (v.every((t) => now - t >= RATE_WINDOW_MS)) hits.delete(k);
-    }
-  }
-  return false;
-}
-
-function clientKey(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0]!.trim();
-  return request.headers.get("x-real-ip") ?? "unknown";
-}
+   It used to be a module-level `Map` here. That is correct on one long-lived process
+   and meaningless on a serverless host, where each instance holds its own copy and
+   the cap becomes per-instance rather than per-person. The shared implementation
+   counts against Postgres when Supabase is configured and falls back to the same
+   in-memory behaviour when it is not. */
+const RATE_LIMIT = { bucket: "orders", max: 12, windowMs: 10 * 60 * 1000 };
 
 function str(value: unknown, max = 200): string {
   return typeof value === "string" ? value.slice(0, max) : "";
@@ -132,10 +116,23 @@ function fail(status: number, body: FailureBody) {
 }
 
 export async function POST(request: Request) {
-  if (rateLimited(clientKey(request))) {
+  if (await isRateLimited(clientKey(request), RATE_LIMIT)) {
     return fail(429, {
       message:
         "That's several orders in a short time. Please wait a few minutes, or message us on WhatsApp and we'll take it from there.",
+    });
+  }
+
+  /* Before anything else: if orders would be written to a filesystem this host
+     throws away, stop here. The customer gets the honest failure below instead of a
+     confirmation screen for an order that no longer exists. */
+  try {
+    assertOrderStoreIsDurable();
+  } catch (error) {
+    console.error("[orders] storage is not durable on this host", error);
+    return fail(502, {
+      message:
+        "We couldn't file that order just now. Please send it to us on WhatsApp and we'll take it from there.",
     });
   }
 

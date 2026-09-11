@@ -1,6 +1,7 @@
 import type { Product } from "@/types/commerce";
 import { placeholderProducts } from "@/data/placeholder-products";
 import { placeholderBrandBats } from "@/data/placeholder-brand-bats";
+import { STUDIO_CATEGORY, studioBats } from "@/data/studio-bats";
 
 /**
  * Static product catalogue for homepage display.
@@ -8,56 +9,51 @@ import { placeholderBrandBats } from "@/data/placeholder-brand-bats";
  * Ratings/review counts omitted until real review data exists.
  */
 const stockedProducts: Product[] = [
+  /* ── KIS range ──────────────────────────────────────────────────────────────
+   * Thirteen models, in the price order the owner supplied. `price` is that figure
+   * exactly: it is what the customer is charged and what lib/orders/order.ts bills,
+   * so the owner's list and the till agree by construction.
+   *
+   * `mrp` is the struck-through "before" price, set by the owner as a promotional
+   * device rather than recorded from past sales. Each is a round retail figure picked
+   * above the selling price — not a percentage divided out — so it reads as a price
+   * tag; `discountPercent()` then derives the badge from the pair, which is why no
+   * percentage is stored anywhere and none can drift out of step with the prices it
+   * describes. Change a selling price and the badge re-derives itself, but the `mrp`
+   * beside it wants revisiting in the same edit.
+   *
+   * `flagship` is read by KISFeatured, which shows the first four as the homepage
+   * band with the first as its hero, so the flags follow the range hierarchy: Master
+   * Pro leads.
+   *
+   * All thirteen carry real studio photographs, every one supplied at 1024x1536 — a
+   * clean 2:3, which is the shape both frames crop from most kindly: 17% off the
+   * height in the card, 25% off the width on the detail page, with the bat centred
+   * and whole in each. Replacing any of them is a matter of dropping a file in under
+   * the same name; nothing here needs editing for that. */
   {
-    id: "kis-mh7000-plus",
-    slug: "kis-mh7000-plus",
-    name: "M&H7000+",
+    id: "kis-master-pro",
+    slug: "kis-master-pro",
+    name: "Master Pro",
     brandSlug: "kis",
     brandName: "KIS",
-    image: "/products/kis-mh7000-plus.jpg",
-    mrp: 12999,
-    price: 11499,
+    image: "/products/kis-master-pro.webp",
+    mrp: 13000,
+    price: 11000,
     badge: "Flagship",
     categorySlug: "kashmir-willow-bats",
     featured: true,
     flagship: true,
   },
   {
-    id: "kis-mh7000",
-    slug: "kis-mh7000",
-    name: "M&H7000",
+    id: "kis-gold-edition",
+    slug: "kis-gold-edition",
+    name: "Gold Edition",
     brandSlug: "kis",
     brandName: "KIS",
-    image: "/products/kis-mh7000.svg",
-    mrp: 10999,
-    price: 9799,
-    badge: "Popular",
-    categorySlug: "kashmir-willow-bats",
-    featured: true,
-    flagship: true,
-  },
-  {
-    id: "kis-bazuka",
-    slug: "kis-bazuka",
-    name: "Bazuka",
-    brandSlug: "kis",
-    brandName: "KIS",
-    image: "/products/kis-bazuka.svg",
-    mrp: 8499,
-    price: 7499,
-    categorySlug: "kashmir-willow-bats",
-    featured: true,
-    flagship: true,
-  },
-  {
-    id: "kis-game-changer",
-    slug: "kis-game-changer",
-    name: "Game Changer",
-    brandSlug: "kis",
-    brandName: "KIS",
-    image: "/products/kis-game-changer.svg",
-    mrp: 7999,
-    price: 6999,
+    image: "/products/kis-gold-edition.webp",
+    mrp: 11000,
+    price: 9000,
     categorySlug: "kashmir-willow-bats",
     featured: true,
     flagship: true,
@@ -68,22 +64,47 @@ const stockedProducts: Product[] = [
     name: "Players Special",
     brandSlug: "kis",
     brandName: "KIS",
-    image: "/products/kis-players-special.svg",
-    mrp: 9499,
-    price: 8499,
+    image: "/products/kis-players-special.webp",
+    mrp: 10000,
+    price: 8500,
     categorySlug: "kashmir-willow-bats",
     featured: true,
     flagship: true,
   },
   {
-    id: "kis-master-pro",
-    slug: "kis-master-pro",
-    name: "Master Pro",
+    id: "kis-mh7000-plus",
+    slug: "kis-mh7000-plus",
+    name: "M&H 7000+",
     brandSlug: "kis",
     brandName: "KIS",
-    image: "/products/kis-master-pro.svg",
-    mrp: 6999,
-    price: 6299,
+    image: "/products/kis-mh7000-plus.webp",
+    mrp: 9500,
+    price: 7800,
+    categorySlug: "kashmir-willow-bats",
+    featured: true,
+    flagship: true,
+  },
+  {
+    id: "kis-mh7000",
+    slug: "kis-mh7000",
+    name: "M&H 7000",
+    brandSlug: "kis",
+    brandName: "KIS",
+    image: "/products/kis-mh7000.webp",
+    mrp: 7500,
+    price: 6300,
+    categorySlug: "kashmir-willow-bats",
+    featured: true,
+  },
+  {
+    id: "kis-bazuka",
+    slug: "kis-bazuka",
+    name: "Bazuka",
+    brandSlug: "kis",
+    brandName: "KIS",
+    image: "/products/kis-bazuka.webp",
+    mrp: 7200,
+    price: 6000,
     categorySlug: "kashmir-willow-bats",
     featured: true,
   },
@@ -93,73 +114,367 @@ const stockedProducts: Product[] = [
     name: "Finisher",
     brandSlug: "kis",
     brandName: "KIS",
-    image: "/products/kis-finisher.svg",
-    mrp: 5999,
-    price: 5499,
+    image: "/products/kis-finisher.webp",
+    mrp: 6000,
+    price: 5300,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "kis-game-changer",
+    slug: "kis-game-changer",
+    name: "Gamechanger",
+    brandSlug: "kis",
+    brandName: "KIS",
+    image: "/products/kis-game-changer.webp",
+    mrp: 5500,
+    price: 4800,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "kis-pr-21",
+    slug: "kis-pr-21",
+    name: "PR 21",
+    brandSlug: "kis",
+    brandName: "KIS",
+    image: "/products/kis-pr-21.webp",
+    mrp: 5000,
+    price: 4300,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "kis-boom-boom",
+    slug: "kis-boom-boom",
+    name: "Boom Boom",
+    brandSlug: "kis",
+    brandName: "KIS",
+    image: "/products/kis-boom-boom.webp",
+    mrp: 4700,
+    price: 4000,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "kis-classic",
+    slug: "kis-classic",
+    name: "Classic",
+    brandSlug: "kis",
+    brandName: "KIS",
+    image: "/products/kis-classic.webp",
+    mrp: 4000,
+    price: 3500,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "kis-limited-edition",
+    slug: "kis-limited-edition",
+    name: "Limited Edition",
+    brandSlug: "kis",
+    brandName: "KIS",
+    image: "/products/kis-limited-edition.webp",
+    mrp: 3600,
+    price: 3200,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "kis-blaster",
+    slug: "kis-blaster",
+    name: "Blaster",
+    brandSlug: "kis",
+    brandName: "KIS",
+    image: "/products/kis-blaster.webp",
+    mrp: 3200,
+    price: 2900,
+    categorySlug: "kashmir-willow-bats",
+  },
+
+  /* ── Valley Woods range ─────────────────────────────────────────────────────
+   * Seven models, in the price order the maker supplied, priced on exactly the
+   * same rule as the KIS range above: `price` is charged, `mrp` is a round
+   * figure above it, and the badge is derived from the pair by discountPercent().
+   *
+   * `flagship` is deliberately absent. It reads as a range hierarchy but is
+   * consumed by KISFeatured, which shows the first four flagship products as the
+   * homepage KIS band — setting it here would eventually push a Valley Woods bat
+   * into a section titled for another brand. Two are `featured`, which is the
+   * flag that means "may appear in the buying row", and is brand-agnostic.
+   *
+   * Naming: the model is "Mythix", spelled as it is printed on the bat itself.
+   * The supplied price list read "MYTHIC"; the photograph was the tiebreaker,
+   * because that is the spelling the customer holds in their hands. */
+  {
+    id: "valleywoods-katana",
+    slug: "valleywoods-katana",
+    name: "Katana",
+    brandSlug: "valleywoods",
+    brandName: "Valley Woods",
+    image: "/products/valleywoods-katana.webp",
+    mrp: 10000,
+    price: 8500,
     categorySlug: "kashmir-willow-bats",
     featured: true,
   },
   {
-    id: "jk-pro-willow",
-    slug: "jk-pro-willow",
-    name: "JK Pro Willow",
-    brandSlug: "jk",
-    brandName: "JK",
-    image: "/products/jk-pro-willow.svg",
-    mrp: 5499,
-    price: 4999,
+    id: "valleywoods-beast-pro",
+    slug: "valleywoods-beast-pro",
+    name: "Beast Pro",
+    brandSlug: "valleywoods",
+    brandName: "Valley Woods",
+    image: "/products/valleywoods-beast-pro.webp",
+    mrp: 8500,
+    price: 7000,
     categorySlug: "kashmir-willow-bats",
     featured: true,
+  },
+  {
+    id: "valleywoods-chasemaster",
+    slug: "valleywoods-chasemaster",
+    name: "Chasemaster",
+    brandSlug: "valleywoods",
+    brandName: "Valley Woods",
+    image: "/products/valleywoods-chasemaster.webp",
+    mrp: 7200,
+    price: 6000,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "valleywoods-shadow",
+    slug: "valleywoods-shadow",
+    name: "Shadow",
+    brandSlug: "valleywoods",
+    brandName: "Valley Woods",
+    image: "/products/valleywoods-shadow.webp",
+    mrp: 6000,
+    price: 5300,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "valleywoods-ghost",
+    slug: "valleywoods-ghost",
+    name: "Ghost",
+    brandSlug: "valleywoods",
+    brandName: "Valley Woods",
+    image: "/products/valleywoods-ghost.webp",
+    mrp: 5400,
+    price: 4600,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "valleywoods-destroyer",
+    slug: "valleywoods-destroyer",
+    name: "Destroyer",
+    brandSlug: "valleywoods",
+    brandName: "Valley Woods",
+    image: "/products/valleywoods-destroyer.webp",
+    mrp: 4700,
+    price: 4100,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "valleywoods-mythix",
+    slug: "valleywoods-mythix",
+    name: "Mythix",
+    brandSlug: "valleywoods",
+    brandName: "Valley Woods",
+    image: "/products/valleywoods-mythix.webp",
+    mrp: 4000,
+    price: 3500,
+    categorySlug: "kashmir-willow-bats",
+  },
+/* ── JK range ───────────────────────────────────────────────────────────────
+   * Five models, in the price order JK supplied, priced on the same rule as the
+   * KIS and Valley Woods ranges above.
+   *
+   * "Most Selling" on the Black Edition is the owner's own claim about their own
+   * sales, which is the only basis on which a badge like that belongs on a card:
+   * it is not derived from anything this project can count, and nothing here
+   * should ever generate one.
+   *
+   * These replace a single entry, "JK Pro Willow" at 4,999, which was carried
+   * over from the initial catalogue and is not part of the range JK supplied. It
+   * pointed at a placeholder SVG that the image optimiser rejects, so it had been
+   * rendering as an error tile rather than a product. */
+  {
+    id: "jk-pro-edition",
+    slug: "jk-pro-edition",
+    name: "Pro Edition",
+    brandSlug: "jk",
+    brandName: "JK",
+    image: "/products/jk-pro-edition.webp",
+    mrp: 18000,
+    price: 15000,
+    categorySlug: "kashmir-willow-bats",
+    featured: true,
+  },
+  {
+    id: "jk-players-edition",
+    slug: "jk-players-edition",
+    name: "Players Edition",
+    brandSlug: "jk",
+    brandName: "JK",
+    image: "/products/jk-players-edition.webp",
+    mrp: 12000,
+    price: 9999,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "jk-black-edition",
+    slug: "jk-black-edition",
+    name: "Black Edition",
+    brandSlug: "jk",
+    brandName: "JK",
+    image: "/products/jk-black-edition.webp",
+    mrp: 11000,
+    price: 9200,
+    badge: "Most Selling",
+    categorySlug: "kashmir-willow-bats",
+    featured: true,
+  },
+  {
+    id: "jk-thunder",
+    slug: "jk-thunder",
+    name: "Thunder",
+    brandSlug: "jk",
+    brandName: "JK",
+    image: "/products/jk-thunder.webp",
+    mrp: 10200,
+    price: 8700,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "jk-acron",
+    slug: "jk-acron",
+    name: "Acron",
+    brandSlug: "jk",
+    brandName: "JK",
+    image: "/products/jk-acron.webp",
+    mrp: 8600,
+    price: 7500,
+    categorySlug: "kashmir-willow-bats",
+  },
+
+/* ── Tramboo range ──────────────────────────────────────────────────────────
+   * Five models, in the price order the maker supplied, priced on the same rule
+   * as the ranges above.
+   *
+   * "Legend" is 12,000. The supplied list read "12,00", which is a dropped zero
+   * either way — the owner confirmed 12,000 rather than 1,200, and it was worth
+   * confirming: at 1,200 it would have been the cheapest bat in the catalogue,
+   * under Tramboo's own Black Edition, and a tenth of what was intended.
+   *
+   * "Auqib Nabi Edition" is the maker's own product name for a signature model.
+   * The name came from the business, not from here — nothing in this project
+   * infers a player's involvement with a bat.
+   *
+   * These replace five invented placeholders (Pro Series, Heritage, Power,
+   * Select, Club) whose prices ran to 9,499 and would have sat on the brand page
+   * beside the real range. */
+  {
+    id: "tramboo-legend",
+    slug: "tramboo-legend",
+    name: "Legend",
+    brandSlug: "tramboo",
+    brandName: "Tramboo",
+    image: "/products/tramboo-legend.webp",
+    mrp: 14500,
+    price: 12000,
+    categorySlug: "kashmir-willow-bats",
+    featured: true,
+  },
+  {
+    id: "tramboo-sigma",
+    slug: "tramboo-sigma",
+    name: "Sigma",
+    brandSlug: "tramboo",
+    brandName: "Tramboo",
+    image: "/products/tramboo-sigma.webp",
+    mrp: 8800,
+    price: 7400,
+    categorySlug: "kashmir-willow-bats",
+    featured: true,
+  },
+  {
+    id: "tramboo-auqib-nabi-edition",
+    slug: "tramboo-auqib-nabi-edition",
+    name: "Auqib Nabi Edition",
+    brandSlug: "tramboo",
+    brandName: "Tramboo",
+    image: "/products/tramboo-auqib-nabi-edition.webp",
+    mrp: 7900,
+    price: 6700,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "tramboo-alpine",
+    slug: "tramboo-alpine",
+    name: "Alpine",
+    brandSlug: "tramboo",
+    brandName: "Tramboo",
+    image: "/products/tramboo-alpine.webp",
+    mrp: 6200,
+    price: 5400,
+    categorySlug: "kashmir-willow-bats",
+  },
+  {
+    id: "tramboo-black-edition",
+    slug: "tramboo-black-edition",
+    name: "Black Edition",
+    brandSlug: "tramboo",
+    brandName: "Tramboo",
+    image: "/products/tramboo-black-edition.webp",
+    mrp: 3900,
+    price: 3499,
+    categorySlug: "kashmir-willow-bats",
   },
 
   /* ── Hard Tennis Bat ───────────────────────────────────────────────────────────
    *
-   * Names and prices as supplied. Nothing else is: no `mrp`, so no strike-through and
-   * no "% off" — a discount needs a real list price, and inventing one to decorate the
-   * card would be inventing a saving that does not exist. No `brandSlug`/`brandName`,
-   * because none were given. No `badge`, no rating.
+   * Four models, names and prices as supplied, each with its own photograph.
    *
-   * Not `featured` either. That flag drives the "What players are buying" row, which
-   * is a separate editorial decision from launching a category — these appear in their
-   * own homepage section and their own catalogue, which is what was asked for.
+   * These replace four earlier entries — Scoop Cricket Bat, Regular Bat, Pro
+   * Tennis Bat and a Black Mamba at a different price — which carried placeholder
+   * SVGs the image optimiser rejects and so had been rendering as error tiles.
    *
-   * The images are the project's own studio placeholders, one per product, at the
-   * paths the real photographs will take. Dropping a real file over each one — same
-   * name, or a `.jpg` with the extension updated here — is the whole handover.
+   * Still no brandSlug/brandName: this range was supplied without brand
+   * attribution, and guessing one would print a manufacturer claim on the card,
+   * the page title and the brand filter. Every reader treats absence as "no
+   * brand" and renders nothing rather than "undefined".
    *
-   * Adding these four is also what switches both Hard Tennis Bat surfaces out of their
-   * launch state: the homepage section and the catalogue page both read the category's
-   * product list, so neither needed an edit. */
-  {
-    id: "scoop-cricket-bat",
-    slug: "scoop-cricket-bat",
-    name: "Scoop Cricket Bat",
-    image: "/products/scoop-cricket-bat.svg",
-    price: 1800,
-    categorySlug: "hard-tennis-bats",
-  },
+   * "Top Selling" on the Scoop Bat is the owner's own claim about their own
+   * sales. Nothing here derives it, and nothing here should. */
   {
     id: "black-mamba",
     slug: "black-mamba",
     name: "Black Mamba",
-    image: "/products/black-mamba.svg",
+    image: "/products/black-mamba.webp",
+    mrp: 3900,
+    price: 3400,
+    categorySlug: "hard-tennis-bats",
+  },
+  {
+    id: "scoop-bat",
+    slug: "scoop-bat",
+    name: "Scoop Bat",
+    image: "/products/scoop-bat.webp",
+    mrp: 2300,
     price: 2000,
+    badge: "Top Selling",
     categorySlug: "hard-tennis-bats",
   },
   {
-    id: "regular-bat",
-    slug: "regular-bat",
-    name: "Regular Bat",
-    image: "/products/regular-bat.svg",
-    price: 1200,
+    id: "hard-tennis-legend",
+    slug: "hard-tennis-legend",
+    name: "Hard Tennis Legend",
+    image: "/products/hard-tennis-legend.webp",
+    mrp: 2050,
+    price: 1800,
     categorySlug: "hard-tennis-bats",
   },
   {
-    id: "pro-tennis-bat",
-    slug: "pro-tennis-bat",
-    name: "Pro Tennis Bat",
-    image: "/products/pro-tennis-bat.svg",
-    price: 1500,
+    id: "kw-limited-edition",
+    slug: "kw-limited-edition",
+    name: "KW Limited Edition",
+    image: "/products/kw-limited-edition.webp",
+    mrp: 1800,
+    price: 1600,
     categorySlug: "hard-tennis-bats",
   },
 
@@ -246,32 +561,51 @@ const stockedProducts: Product[] = [
  * load-bearing. When the real equipment stock arrives, delete the import and this spread
  * and the site loses 48 products with no other edit.
  */
+/* ── Everything with a price ──
+ *
+ * `products` is the pricing authority: `getProductBySlug` reads it, `resolveCart`
+ * resolves through that, and `POST /api/orders` recomputes every line total from it.
+ * The three made-to-order studio bats are in here for exactly that reason — a line
+ * whose slug is not here is dropped from the order entirely.
+ *
+ * They are not browsable, though, and every list-shaped helper below filters them
+ * out. See `data/studio-bats.ts` for why a bat that is built to order has no shelf
+ * to sit on. `getProductBySlug` is deliberately *not* filtered: the cart, the order
+ * and the workshop all have to be able to resolve one. */
 export const products: Product[] = [
   ...stockedProducts,
   ...placeholderBrandBats,
   ...placeholderProducts,
+  ...studioBats,
 ];
 
+/** The browsable catalogue: `products` minus anything that only exists to be built
+ *  to order. One predicate, so a new non-browsable range cannot be half-hidden. */
+const browsable = products.filter((p) => p.categorySlug !== STUDIO_CATEGORY);
+
 export function getFeaturedProducts(limit = 8): Product[] {
-  return products.filter((p) => p.featured).slice(0, limit);
+  return browsable.filter((p) => p.featured).slice(0, limit);
 }
 
 export function getFlagshipProducts(): Product[] {
-  return products.filter((p) => p.flagship);
+  return browsable.filter((p) => p.flagship);
 }
 
 export function getProductsByBrand(brandSlug: string): Product[] {
-  return products.filter((p) => p.brandSlug === brandSlug);
+  return browsable.filter((p) => p.brandSlug === brandSlug);
 }
 
 export function getProductsByCategory(categorySlug: string): Product[] {
-  return products.filter((p) => p.categorySlug === categorySlug);
+  return browsable.filter((p) => p.categorySlug === categorySlug);
 }
 
 export function getProductBySlug(slug: string): Product | undefined {
   return products.find((p) => p.slug === slug);
 }
 
+/** Drives `generateStaticParams` and the sitemap, so it lists routes worth
+ *  prerendering and indexing. A studio bat has no product page to index — the studio
+ *  is its page. */
 export function getAllProductSlugs(): string[] {
-  return products.map((p) => p.slug);
+  return browsable.map((p) => p.slug);
 }

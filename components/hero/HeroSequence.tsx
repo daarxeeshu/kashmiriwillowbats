@@ -653,7 +653,7 @@ export function HeroSequence() {
           }}
         >
           <Image
-            src="/hero/ball.svg"
+            src="/hero/ball.webp"
             alt=""
             width={240}
             height={240}

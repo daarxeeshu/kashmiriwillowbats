@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { ButtonLink } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/utils";
 import { buildWhatsAppUrl, whatsappMessages } from "@/lib/whatsapp";
+import { CustomiseBatCard } from "@/components/home/CustomiseBatCard";
 
 export const metadata: Metadata = {
   title: "Customize Your Bat",
@@ -17,6 +18,7 @@ export default function CustomizePage() {
   const { price, freeThreshold } = siteConfig.engraving;
 
   return (
+    <>
     <Container className="section-padding">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Customize" }]} />
       <div className="mt-6 grid gap-10 lg:grid-cols-2 lg:items-center">
@@ -63,5 +65,12 @@ export default function CustomizePage() {
         Request engraving on WhatsApp
       </ButtonLink>
     </Container>
+
+      {/* The other half of this page's subject, in the card the homepage uses. This
+          page explains what engraving costs; the studio lets someone place it on a
+          bat and watch it burn in. Outside the `Container` because the card carries
+          its own full-bleed forest ground. */}
+      <CustomiseBatCard />
+    </>
   );
 }

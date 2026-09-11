@@ -1,0 +1,35 @@
+[
+  {
+    "id": "gold",
+    "label": "Gold / Black",
+    "swatch": "#C9A227",
+    "shield": {
+      "src": "stickers/kis-master-pro-gold-shield.webp",
+      "w": 415,
+      "h": 851,
+      "aspect": 0.4877
+    }
+  },
+  {
+    "id": "red",
+    "label": "Crimson",
+    "swatch": "#D31F26",
+    "shield": {
+      "src": "stickers/kis-master-pro-red-shield.webp",
+      "w": 421,
+      "h": 853,
+      "aspect": 0.4936
+    }
+  },
+  {
+    "id": "blue",
+    "label": "Royal Blue",
+    "swatch": "#0A6ED1",
+    "shield": {
+      "src": "stickers/kis-master-pro-blue-shield.webp",
+      "w": 421,
+      "h": 851,
+      "aspect": 0.4947
+    }
+  }
+]

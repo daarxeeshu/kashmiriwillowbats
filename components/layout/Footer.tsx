@@ -35,6 +35,7 @@ const footerGroups: FooterLinkGroup[] = [
     title: "Company",
     links: [
       { label: "About Us", href: "/about" },
+      { label: "Wall of Fame", href: "/wall-of-fame" },
       { label: "KIS", href: "/brands/kis" },
       { label: "Our Brands", href: "/brands" },
       { label: "Physical Store", href: "/store" },

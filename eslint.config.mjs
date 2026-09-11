@@ -13,6 +13,14 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "scripts/**",
+    /* Third-party build output served as static assets, not source we maintain.
+       `public/configurator/draco/draco_wasm_wrapper.js` is Google's compiled Draco
+       decoder — 6 lint errors in generated code nobody is going to hand-edit, which
+       is exactly the noise that trains people to ignore a red lint run. */
+    "public/**",
+    /* One-off measurement scripts kept for reference, not shipped and not imported
+       by anything in `app/` or `components/`. */
+    ".analysis/**",
   ]),
 ]);
 

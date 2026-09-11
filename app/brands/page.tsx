@@ -8,7 +8,7 @@ import { Container } from "@/components/ui/Container";
 export const metadata: Metadata = {
   title: "Cricket Brands",
   description:
-    "Shop KIS, JK, Valleywoods, SLS, Woodford, Whiteduck, IB, A Star and more from Kashmir's cricket hub.",
+    "Shop KIS, JK, Valley Woods and Tramboo cricket bats from Kashmir's cricket hub.",
 };
 
 export default function BrandsPage() {

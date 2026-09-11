@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import {
   getAllProductSlugs,
   getProductBySlug,
@@ -18,6 +18,7 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink, buttonClass } from "@/components/ui/Button";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { OrderOnWhatsAppDialog } from "@/components/product/OrderOnWhatsAppDialog";
 import { BatOptionsPicker } from "@/components/product/BatOptionsPicker";
 import { isConfigurableBat } from "@/data/bat-options";
 import { discountPercent, formatPrice } from "@/lib/utils";
@@ -57,14 +58,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const category = getCategoryBySlug(product.categorySlug);
   const discount =
     product.mrp != null ? discountPercent(product.mrp, product.price) : 0;
-
-  // The name alone identifies an unattributed product. This message is what the
-  // customer sends us, so a stray "undefined" in it would land in a real WhatsApp
-  // thread.
-  const productLine = product.brandName
-    ? `${product.brandName} ${product.name}`
-    : product.name;
-  const whatsappMessage = `${whatsappMessages.general}\n\nProduct: ${productLine}\nPrice: ${formatPrice(product.price)}`;
 
   return (
     <Container className="section-padding">
@@ -202,30 +195,29 @@ export default async function ProductPage({ params }: ProductPageProps) {
               price={product.price}
             />
           ) : (
-            <AddToCartButton
-              slug={product.slug}
-              name={product.name}
-              size="lg"
-              className={buttonClass({
-                variant: "primary",
-                size: "lg",
-                className: "mt-8 w-full",
-              })}
-            />
+            <>
+              <AddToCartButton
+                slug={product.slug}
+                name={product.name}
+                size="lg"
+                className={buttonClass({
+                  variant: "primary",
+                  size: "lg",
+                  className: "mt-8 w-full",
+                })}
+              />
+              {/* A bat with a spec carries its own ordering button inside
+                  `BatOptionsPicker`, next to the dropdowns whose values it sends.
+                  Everything else has no spec to collect, so it mounts here. */}
+              <OrderOnWhatsAppDialog
+                slug={product.slug}
+                name={product.name}
+                className="mt-3 w-full"
+              />
+            </>
           )}
 
           <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink
-              href={buildWhatsAppUrl(whatsappMessage)}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="outline"
-              size="lg"
-              className="flex-1"
-            >
-              <MessageCircle className="h-4 w-4" />
-              Order on WhatsApp
-            </ButtonLink>
             <ButtonLink
               href={buildWhatsAppUrl(whatsappMessages.batExpert)}
               target="_blank"

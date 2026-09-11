@@ -11,6 +11,7 @@ import {
   normaliseEngraving,
 } from "@/data/bat-options";
 import { useCart } from "@/components/cart/CartProvider";
+import { OrderOnWhatsAppDialog } from "@/components/product/OrderOnWhatsAppDialog";
 import { buttonClass } from "@/components/ui/Button";
 import { siteConfig } from "@/data/site-config";
 import { cn, formatPrice } from "@/lib/utils";
@@ -180,6 +181,19 @@ export function BatOptionsPicker({ slug, name, price }: BatOptionsPickerProps) {
           </>
         )}
       </button>
+
+      {/* Ordering straight over WhatsApp lives here rather than on the page around it,
+          because this is where the spec is: the dropdowns above and the engraving are
+          component state, and a button outside could only ever send the bat's name.
+          Passing them down is what puts "Bat size: SH - Full Size" in the message the
+          shop receives instead of a bare product line. */}
+      <OrderOnWhatsAppDialog
+        slug={slug}
+        name={name}
+        options={options}
+        engraving={cleanEngraving}
+        className="mt-3 w-full"
+      />
 
     </div>
   );

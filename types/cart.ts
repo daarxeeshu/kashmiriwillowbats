@@ -89,10 +89,37 @@ export interface OrderLine {
   engraving: string | null;
 }
 
+/* ── What we actually know about an order ────────────────────────────────────────
+ *
+ * Three states, and the boundary between them is what this project can honestly
+ * observe rather than what would read well on a dashboard.
+ *
+ *   new             The order exists on the server. The customer has not opened
+ *                   WhatsApp. This is the state worth watching: someone specified a
+ *                   bat, gave their address, and then stopped.
+ *
+ *   whatsapp_opened They tapped through and WhatsApp opened with the message ready.
+ *                   Not proof they sent it — the send happens inside WhatsApp, where
+ *                   this site cannot see. Likely, not certain.
+ *
+ *   confirmed       The message reached the shop. Only a person can know this, by
+ *                   looking at the WhatsApp inbox, so it is only ever set by hand
+ *                   from the admin dashboard.
+ *
+ * There is deliberately no status meaning "the shop has this order" that gets set
+ * automatically. The previous single value, "received", claimed exactly that on a
+ * screen the customer read, while nothing had received anything. */
+export type OrderStatus = "new" | "whatsapp_opened" | "confirmed";
+
 export interface Order {
   orderId: string;
   createdAt: string;
-  status: "received";
+  status: OrderStatus;
+  /** When the customer opened WhatsApp, ISO. Null until they do — and still null
+   *  forever if they never do, which is the signal the dashboard surfaces. */
+  whatsappOpenedAt: string | null;
+  /** When a person marked the message as actually received, ISO. */
+  confirmedAt: string | null;
   lines: OrderLine[];
   itemCount: number;
   subtotal: number;

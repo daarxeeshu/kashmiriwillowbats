@@ -56,90 +56,30 @@ const RANGES: ReadonlyArray<
   [
     "jk",
     "JK",
-    [
-      ["Thunder", 8499],
-      ["Sixer", 6999],
-      ["Warrior", 7499],
-      ["Classic", 5499],
-    ],
+    /* Emptied, not deleted: the brand is stocked for real in data/products.ts — five
+       models with JK's own names, prices and photographs. One of the invented four was
+       also called "Thunder", which would have put a made-up ₹8,499 bat beside the real
+       one under the same name on the same brand page. */
+    [],
   ],
-  [
-    "valleywoods",
-    "Valley Woods",
-    [
-      ["Legend", 9999],
-      ["Pro", 8999],
-      ["Elite", 7499],
-      ["Striker", 6799],
-      ["Classic", 5999],
-    ],
-  ],
+  /* Valley Woods is stocked for real — seven models with the maker's own names,
+     prices and photographs, in data/products.ts. The five invented ones that stood
+     here (Legend, Pro, Elite, Striker, Classic) are gone rather than left alongside:
+     a brand page showing four real bats and five imaginary ones is worse than one
+     showing four, and the invented names would outrank the real ones on price. */
   [
     "tramboo",
     "Tramboo",
-    [
-      ["Pro Series", 9499],
-      ["Heritage", 8499],
-      ["Power", 7299],
-      ["Select", 5899],
-      ["Club", 4999],
-    ],
+    /* Emptied: the brand is stocked for real in data/products.ts — five models with
+       Tramboo's own names, prices and photographs. */
+    [],
   ],
-  [
-    "woodford",
-    "Woodford",
-    [
-      ["Premier", 9299],
-      ["Player", 8199],
-      ["Blaze", 7899],
-      ["Classic", 6299],
-      ["Academy", 4799],
-    ],
-  ],
-  [
-    "whiteduck",
-    "Whiteduck",
-    [
-      ["Apex", 9599],
-      ["Storm", 8799],
-      ["Impact", 7599],
-      ["Drive", 6499],
-      ["Club", 5299],
-    ],
-  ],
-  [
-    "sls",
-    "SLS",
-    [
-      ["Pro Elite", 10499],
-      ["Titan", 9199],
-      ["Velocity", 8299],
-      ["Match", 6199],
-      ["Academy", 4899],
-    ],
-  ],
-  [
-    "ib",
-    "IB",
-    [
-      ["International", 9899],
-      ["Supreme", 8999],
-      ["Power Play", 7799],
-      ["Ranger", 6899],
-      ["Classic", 5599],
-    ],
-  ],
-  [
-    "a-star",
-    "A Star",
-    [
-      ["Champion", 9299],
-      ["Pro", 8399],
-      ["Blaze", 7899],
-      ["Rising", 6599],
-      ["Club", 4699],
-    ],
-  ],
+  /* Woodford, Whiteduck, SLS, IB and A Star are gone, with the twenty-five invented
+     models they carried, on the owner's instruction — the brands themselves were
+     removed from data/brands.ts. A range left here without its brand would still
+     have produced products: they are built from this table, not from the brand list,
+     so a product page and a sitemap entry would survive for a brand whose page had
+     stopped existing. */
 ];
 
 

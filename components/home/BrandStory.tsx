@@ -9,7 +9,7 @@ export function BrandStory() {
         <FadeIn className="relative mx-auto w-full max-w-xl lg:max-w-none">
           <div className="relative aspect-[4/5] overflow-hidden rounded-sm border border-border">
             <Image
-              src="/hero/brand-story.jpg"
+              src="/hero/brand-story.webp"
               alt="Brand story"
               fill
               className="object-cover"

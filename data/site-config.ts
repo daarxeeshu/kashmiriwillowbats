@@ -6,7 +6,10 @@ export const siteConfig = {
   domain: "kashmiriwillowbats.com",
   url: "https://kashmiriwillowbats.com",
   description:
-    "Authentic Kashmir Willow bats and professional cricket equipment. Multi-brand cricket store from Kashmir — KIS, JK, Valleywoods, SLS, Woodford & more.",
+    // Names only brands that are actually stocked. This string is the site-wide meta
+    // description, so a brand listed here that has no page is a search result leading
+    // to a 404.
+    "Authentic Kashmir Willow bats and professional cricket equipment. Multi-brand cricket store from Kashmir — KIS, JK, Valley Woods and Tramboo.",
   tagline: "The Home of Kashmiri Willow",
   engraving: {
     price: 200,
@@ -99,6 +102,11 @@ export const mainNav: NavEntry[] = [
       // Third bat category, and it belongs with the other two rather than under
       // Equipment — a hard tennis bat is a bat, not an accessory.
       { label: "Hard Tennis Bat", href: "/categories/hard-tennis-bats" },
+      /* Inside the group rather than beside it. The measured note above is the
+         reason: the desktop row has 730px at 1024px and a fourth top-level item
+         would spend the margin that keeps "Bat Doctor" on one line. A dropdown has
+         free vertical space, and a made-to-order bat belongs with the bats. */
+      { label: "Customise in 3D", href: "/customize/3d" },
     ],
   },
   // Drawer-only, with Offers below. Both keep their routes and their place in the

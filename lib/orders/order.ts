@@ -6,6 +6,7 @@ import type {
 } from "@/types/cart";
 import type { AppliedCoupon } from "./coupon";
 import { describeBatOptions } from "@/data/bat-options";
+import { orderStore } from "@/lib/orders/store";
 
 /** Same unambiguous alphabet as the repair reference: no 0/O, no 1/I/L, because this
  *  gets read down a phone line. `KWB-2026-7K4Q`. */
@@ -51,7 +52,12 @@ export function buildOrder(
   return {
     orderId,
     createdAt: now.toISOString(),
-    status: "received",
+    /* "new", not "received": at this instant the order exists on the server and
+       nobody at the shop has seen it. It becomes "whatsapp_opened" when the customer
+       taps through, and "confirmed" only when a person says the message arrived. */
+    status: "new",
+    whatsappOpenedAt: null,
+    confirmedAt: null,
     lines,
     itemCount,
     subtotal,
@@ -74,7 +80,16 @@ export function buildOrder(
  * the customer's contact details are not, and a server log is the wrong place to keep
  * them. */
 export async function persistOrder(order: Order): Promise<void> {
-  console.info("[orders] order received", {
+  /* The order is written before anything is reported as succeeding. If this throws,
+   * the route's catch turns it into a failure the customer sees — which is correct:
+   * an order that was not stored has not been placed, and telling someone otherwise
+   * is what this whole feature exists to stop. */
+  await orderStore.save(order);
+
+  /* Deliberately no customer block. Terminal output ends up in log aggregators, CI
+   * output and screen shares, and a name with a phone number and a home address does
+   * not belong in any of them. The order id is enough to find the record. */
+  console.info("[orders] order stored", {
     orderId: order.orderId,
     status: order.status,
     createdAt: order.createdAt,

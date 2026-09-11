@@ -26,56 +26,22 @@ export const brands: Brand[] = [
     name: "Valley Woods",
     descriptor: "Valley-crafted willow specialists",
     logo: "/brands/valleywoods.svg",
-    image: "/brands/valleywoods-cover.svg",
+    image: "/brands/valleywoods-cover.webp",
   },
   {
     id: "tramboo",
     slug: "tramboo",
     name: "Tramboo",
     descriptor: "Kashmir willow craftsmen",
-    image: "/brands/tramboo-cover.svg",
+    image: "/brands/tramboo-cover.webp",
     // no logo yet — typographic placeholder used automatically
   },
-  {
-    id: "woodford",
-    slug: "woodford",
-    name: "Woodford",
-    descriptor: "Premium willow craftsmanship",
-    logo: "/brands/woodford.svg",
-    image: "/brands/woodford-cover.svg",
-  },
-  {
-    id: "whiteduck",
-    slug: "whiteduck",
-    name: "Whiteduck",
-    descriptor: "Distinctive cricket bats",
-    logo: "/brands/whiteduck.svg",
-    image: "/brands/whiteduck-cover.svg",
-  },
-  {
-    id: "sls",
-    slug: "sls",
-    name: "SLS",
-    descriptor: "Performance cricket equipment",
-    logo: "/brands/sls.svg",
-    image: "/brands/sls-cover.svg",
-  },
-  {
-    id: "ib",
-    slug: "ib",
-    name: "IB",
-    descriptor: "International quality bats",
-    logo: "/brands/ib.svg",
-    image: "/brands/ib-cover.svg",
-  },
-  {
-    id: "a-star",
-    slug: "a-star",
-    name: "A Star",
-    descriptor: "Rising cricket brand",
-    logo: "/brands/a-star.svg",
-    image: "/brands/a-star-cover.svg",
-  },
+  /* Woodford, Whiteduck, SLS, IB and A Star were removed on the owner's instruction.
+     They were never stocked: each carried five invented models at invented prices and
+     a cover the image optimiser rejected, so all five brand cards had been rendering
+     as error tiles. Their placeholder ranges went with them — see
+     data/placeholder-brand-bats.ts. Nothing else read these slugs, so removing them
+     drops the brand pages, their products and their sitemap entries together. */
 ];
 
 export function getBrandBySlug(slug: string): Brand | undefined {

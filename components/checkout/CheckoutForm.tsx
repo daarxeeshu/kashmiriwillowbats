@@ -200,9 +200,18 @@ export function CheckoutForm() {
       }
 
       setOrder(body.order as Order);
-      // Cleared only after the order exists on the server, never before: a failed
-      // request that had already emptied the cart would lose the whole basket.
-      clear();
+      /* The basket is deliberately NOT emptied here.
+       *
+       * It used to be, on the reasoning that the order now existed on the server so
+       * the cart had done its job. But an order that has not reached WhatsApp has not
+       * reached the shop, and emptying the basket at this moment punished exactly the
+       * person who hesitated: they landed on the confirmation screen, chose Continue
+       * shopping, and found the basket gone and no way back to the order. Their bat,
+       * its size, handle, profile and engraving all had to be chosen again.
+       *
+       * So the basket now survives until the message is actually sent — see the
+       * WhatsApp button below, which clears it as it hands over. Someone who abandons
+       * here keeps everything they picked. */
     } catch {
       setFailure(
         "We couldn't reach the server. Check your connection, or message us on WhatsApp.",
@@ -220,14 +229,17 @@ export function CheckoutForm() {
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent/15">
             <Check className="h-6 w-6 text-accent" aria-hidden="true" />
           </span>
-          <h1 className="heading-lg mt-6">Order received</h1>
+          {/* "Order received" claimed the shop had it. Nothing had received anything:
+              the order is stored on our side and reaches a person only when the
+              message below is sent. The heading now says which of those has happened. */}
+          <h1 className="heading-lg mt-6">Your order is saved</h1>
           <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-            Your reference is{" "}
+            Reference{" "}
             <span className="font-mono font-semibold text-foreground">
               {order.orderId}
             </span>
-            . Send it to us on WhatsApp and we will confirm availability, engraving and
-            the final total including shipping.
+            . Send it on WhatsApp to reach us — we will confirm availability, engraving
+            and the final total including shipping.
           </p>
 
           {/* The actual delivery step. Nothing is charged here, so the order is not
@@ -237,6 +249,22 @@ export function CheckoutForm() {
             href={buildWhatsAppUrl(buildOrderMessage(order))}
             target="_blank"
             rel="noopener noreferrer"
+            /* This is the moment the order leaves for a person, so it is where both
+               of the "the basket is finished with" consequences belong: mark the order
+               as having reached WhatsApp, and empty the cart. Anyone who never gets
+               this far keeps what they picked.
+
+               The fetch is fire-and-forget — the customer is navigating away and must
+               not be delayed, or shown an error, because our own bookkeeping failed. */
+            onClick={() => {
+              void fetch("/api/orders/opened", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orderId: order.orderId }),
+                keepalive: true,
+              }).catch(() => {});
+              clear();
+            }}
             variant="primary"
             size="lg"
             className="mt-8 w-full sm:w-auto"
@@ -295,9 +323,18 @@ export function CheckoutForm() {
             )}
           </div>
 
+          {/* Leaving without sending is allowed, but it should not read as though the
+              order is done — it is saved, not delivered. Saying so here, next to the
+              way out, is the difference between a customer who knows to come back and
+              one who waits for a reply that was never going to come. */}
+          <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
+            Not ready to send? Your basket is kept as it is, so you can come back and
+            finish from the cart. We only see this order once the message is sent.
+          </p>
+
           <Link
             href="/categories/kashmir-willow-bats"
-            className="mt-6 inline-block text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            className="mt-3 inline-block text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
             Continue shopping
           </Link>

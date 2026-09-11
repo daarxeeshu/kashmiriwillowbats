@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import GlassSurface from "@/components/GlassSurface";
+import { PromoTape } from "@/components/ui/PromoTape";
 import type { Brand } from "@/types/commerce";
 
 interface BrandCardProps {
@@ -79,6 +80,11 @@ export function BrandCard({
 
         {/* Gradient scrim */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0e0d0b]/90 via-[#0e0d0b]/20 to-transparent" />
+
+        {/* The cycling promo tape, top-right so it never collides with the Flagship
+            chip at top-left. The tilt alternates by position: four identical angles
+            in a row read as a printed template rather than something stuck on. */}
+        <PromoTape tilt={index % 2 === 0 ? -6 : 5} />
 
         {/* Flagship badge */}
         {brand.isFlagship && (

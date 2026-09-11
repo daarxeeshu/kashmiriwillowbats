@@ -1,0 +1,27 @@
+/* ── LightRays ──────────────────────────────────────────────────────────────────
+ *
+ * Adapted from the React Bits `LightRays` (reactbits.dev).
+ *
+ * ── One change from the source stylesheet ──
+ * The original sets `z-index: 3` here. That is a decision about what the rays sit
+ * *in front of*, which the component cannot know — dropped into a section whose
+ * content is at `z-index: 1`, it paints the rays over the copy. Stacking belongs to
+ * the caller, so this file positions and clips and nothing more; see the wrapper in
+ * `CustomiseBatCard`.
+ */
+
+.light-rays-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  /* Decoration. It must never eat a click meant for the card behind it — and it
+     covers the whole section, so without this it would eat all of them. */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.light-rays-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
