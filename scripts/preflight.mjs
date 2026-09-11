@@ -80,19 +80,45 @@ if (supabaseUrl && supabaseKey) {
 
 /* ── WhatsApp ───────────────────────────────────────────────────────────────── */
 
-const whatsapp = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "").replace(/\D/g, "");
-if (!process.env.NEXT_PUBLIC_WHATSAPP_NUMBER) {
-  /* Not fatal: `whatsappHref` falls back to /contact, and the copy is written to
-     stay honest when it does. Worth saying, because the shop takes its orders
-     through WhatsApp and every CTA quietly becomes a contact link. */
-  warn("NEXT_PUBLIC_WHATSAPP_NUMBER not set — CTAs fall back to /contact");
-  note("The site is built to degrade honestly here, but this is how orders arrive.");
-} else if (whatsapp.length < 10) {
-  bad(`NEXT_PUBLIC_WHATSAPP_NUMBER has ${whatsapp.length} digits, needs 10+`);
-  note("Country code first, digits only. A malformed number becomes a wa.me link");
-  note("that looks like a working button and opens a WhatsApp error.");
+/* `getWhatsAppNumber()` is `process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ||
+   siteConfig.whatsappNumber`, so checking only the variable answers the wrong
+   question: the site ships with a working business number in code and the variable
+   is an override for staging. An earlier version of this check warned that CTAs
+   "fall back to /contact" whenever the variable was unset, which was simply untrue
+   and would have sent someone hunting for a problem that did not exist.
+
+   So resolve it the same way the app does, and report on the result. */
+const envNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "").replace(/\D/g, "");
+let codeNumber = "";
+try {
+  const config = readFileSync("data/site-config.ts", "utf8");
+  codeNumber = (config.match(/whatsappNumber:\s*"([^"]*)"/)?.[1] ?? "").replace(
+    /\D/g,
+    "",
+  );
+} catch {
+  /* Reported by the domain check below; not worth two messages. */
+}
+
+const source = envNumber
+  ? "NEXT_PUBLIC_WHATSAPP_NUMBER"
+  : "data/site-config.ts fallback";
+const resolved = envNumber || codeNumber;
+
+if (envNumber && envNumber.length < 10) {
+  /* The variable wins over the fallback, so a malformed override is worse than no
+     override: it replaces a working number with a broken one. */
+  bad(`NEXT_PUBLIC_WHATSAPP_NUMBER has ${envNumber.length} digits, needs 10+`);
+  note("It overrides the working number in site-config, so a malformed value here");
+  note("turns every live CTA into a wa.me link that opens a WhatsApp error.");
+} else if (resolved.length < 10) {
+  bad("no usable WhatsApp number from either the environment or site-config");
+  note("Every CTA falls back to /contact. This is how the shop takes orders.");
 } else {
-  ok(`NEXT_PUBLIC_WHATSAPP_NUMBER set (${whatsapp.length} digits)`);
+  ok(`WhatsApp number resolves (${resolved.length} digits, from ${source})`);
+  if (!envNumber) {
+    note("No override set, so the number compiled into site-config is the live one.");
+  }
 }
 
 /* ── Admin ──────────────────────────────────────────────────────────────────── */
