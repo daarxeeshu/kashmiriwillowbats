@@ -133,10 +133,35 @@ if (!adminUser || !adminPassword) {
   warn("ADMIN_USER / ADMIN_PASSWORD not set — /admin returns 503, by design");
   note("Set both to use the orders dashboard and the promo tape editor.");
 } else {
-  ok(`admin credentials set (password ${adminPassword.length} chars)`);
-  if (adminPassword.length < 16) {
+  /* Length alone is not strength, and checking only length is how a 29-character
+     password reading "test-only-not-a-real-password" passed this check while
+     guarding a table of customer names, phone numbers and home addresses on a
+     public repo. A placeholder is worse than a short password: a short one at least
+     has to be brute-forced. */
+  const placeholder =
+    /test|example|placeholder|changeme|change-me|password|secret|admin|demo|dummy|foo|bar|sample|not-a-real|temp|qwerty|123456/i.test(
+      adminPassword,
+    );
+
+  if (placeholder) {
+    bad("ADMIN_PASSWORD looks like a placeholder, not a password");
+    note("/admin/orders exposes customer names, phone numbers and addresses, and");
+    note("middleware.ts is readable by anyone if the repo is public — so the");
+    note("password is the only thing protecting it. Generate a real one:");
+    note("  node -e \"console.log(require('crypto').randomBytes(24).toString('base64url'))\"");
+  } else if (adminPassword.length < 20) {
     warn(`admin password is ${adminPassword.length} chars — prefer 24+`);
-    note("HTTP Basic sends it on every request. Length is the only defence.");
+    note("HTTP Basic sends it on every request, so length is the main defence.");
+  } else {
+    ok(`admin credentials set (password ${adminPassword.length} chars)`);
+  }
+
+  if (/^(admin|owner|root|user|test|demo)$/i.test(adminUser)) {
+    /* Not a failure on its own — Basic auth needs both halves and the password is
+       what carries the weight. Worth saying, because a guessable username halves
+       the work and costs nothing to change. */
+    warn(`ADMIN_USER is "${adminUser}" — a guessable default`);
+    note("Basic auth compares both halves; an unguessable username is free entropy.");
   }
 }
 
