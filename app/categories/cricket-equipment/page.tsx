@@ -8,19 +8,14 @@ import { Container } from "@/components/ui/Container";
 const equipmentSlugs = new Set([
   "batting-gloves",
   "batting-pads",
-  "thigh-guards",
-  "helmets",
-  "cricket-balls",
-  "cricket-shoes",
   "cricket-bags",
-  "accessories",
 ]);
 
 const equipmentCategories = categories.filter((c) => equipmentSlugs.has(c.id));
 
 export const metadata: Metadata = {
   title: "Cricket Equipment",
-  description: "Protective gear, balls, shoes, bags and cricket accessories.",
+  description: "Batting gloves, batting pads and cricket kit bags.",
 };
 
 export default function CricketEquipmentPage() {
@@ -36,7 +31,7 @@ export default function CricketEquipmentPage() {
         className="mt-6"
         eyebrow="Full catalogue"
         title="Cricket equipment"
-        description="Browse protective gear, balls, footwear, bags and accessories — catalogue expanding as products go live."
+        description="Batting gloves, pads and kit bags — every model in stock and photographed."
       />
 
       <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

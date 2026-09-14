@@ -15,12 +15,7 @@ export type CategoryIconKey =
   | "hard-tennis"
   | "gloves"
   | "pads"
-  | "thigh-guard"
-  | "helmet"
-  | "ball"
-  | "shoes"
-  | "bag"
-  | "accessories";
+  | "bag";
 
 export type CategoryAccent = "forest" | "brass" | "charcoal" | "sage" | "warm";
 

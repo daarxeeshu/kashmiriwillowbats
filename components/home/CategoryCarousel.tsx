@@ -379,7 +379,14 @@ export function CategoryCarousel() {
                       src={cat.img}
                       alt={cat.label}
                       fill
-                      sizes={`${CARD_W}px`}
+                      /* Not `${CARD_W}px`. The card's layout box is CARD_W, but the
+                         carousel scales the centred card up to ~1.5x, and `sizes` has
+                         to describe what is painted, not what is laid out — measured
+                         at 299px against a declared 200px. Under-declaring made Next
+                         serve a 256px file into a box needing 370px at DPR 1.25, and
+                         nearly 600px on a retina screen, which is what made the
+                         covers look soft. */
+                      sizes={`${Math.round(CARD_W * 1.5)}px`}
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                       draggable={false}
                     />

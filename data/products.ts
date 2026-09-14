@@ -1,5 +1,4 @@
 import type { Product } from "@/types/commerce";
-import { placeholderProducts } from "@/data/placeholder-products";
 import { placeholderBrandBats } from "@/data/placeholder-brand-bats";
 import { STUDIO_CATEGORY, studioBats } from "@/data/studio-bats";
 
@@ -545,6 +544,215 @@ const stockedProducts: Product[] = [
     price: 15000,
     categorySlug: "english-willow-bats",
   },
+/* ── Batting pads ──────────────────────────────────────────────────────────────
+   *
+   * Seven models, names and prices as supplied, each with its own photograph.
+   * These replace six invented placeholders (Pro Batting Pads, Elite Leg Guards,
+   * Match Shield Pads and the rest) in data/placeholder-products.ts.
+   *
+   * No brandSlug, on the same rule the Hard Tennis range follows: none was
+   * supplied. Every pad in the photographs does carry KIS branding, so attributing
+   * them is very likely correct — but "likely" is not the standard for printing a
+   * manufacturer on a product card, a page title and a brand listing, and adding
+   * it later is two lines per entry with no component changes. */
+  {
+    id: "pads-players-special",
+    slug: "pads-players-special",
+    name: "Players Special",
+    image: "/products/pads-players-special.webp",
+    mrp: 4100,
+    price: 3500,
+    categorySlug: "batting-pads",
+  },
+  {
+    id: "pads-robust",
+    slug: "pads-robust",
+    name: "Robust",
+    image: "/products/pads-robust.webp",
+    mrp: 3000,
+    price: 2600,
+    categorySlug: "batting-pads",
+  },
+  {
+    id: "pads-elite",
+    slug: "pads-elite",
+    name: "Elite",
+    image: "/products/pads-elite.webp",
+    mrp: 2850,
+    price: 2500,
+    categorySlug: "batting-pads",
+  },
+  {
+    id: "pads-finisher",
+    slug: "pads-finisher",
+    name: "Finisher",
+    image: "/products/pads-finisher.webp",
+    mrp: 2700,
+    price: 2400,
+    categorySlug: "batting-pads",
+  },
+  {
+    id: "pads-players",
+    slug: "pads-players",
+    name: "Players",
+    image: "/products/pads-players.webp",
+    mrp: 2700,
+    price: 2400,
+    categorySlug: "batting-pads",
+  },
+  {
+    id: "pads-legend",
+    slug: "pads-legend",
+    name: "Legend",
+    image: "/products/pads-legend.webp",
+    mrp: 2250,
+    price: 2000,
+    categorySlug: "batting-pads",
+  },
+  {
+    id: "pads-blaster",
+    slug: "pads-blaster",
+    name: "Blaster",
+    image: "/products/pads-blaster.webp",
+    mrp: 1700,
+    price: 1500,
+    categorySlug: "batting-pads",
+  },
+  /* ── Batting gloves ────────────────────────────────────────────────────────────
+   *
+   * Six models, names and prices as supplied, each with its own photograph. These
+   * replace six invented placeholders (Pro Grip Batting Gloves, Elite Shield Gloves
+   * and the rest) in data/placeholder-products.ts.
+   *
+   * Slugs carry a `gloves-` prefix. Legend, Robust, Game Changer and Signature are
+   * also bat or pad model names already live on their own routes, so a bare slug
+   * would not be a style choice — it would be a collision.
+   *
+   * No brandSlug, on the same rule the Hard Tennis and pad ranges follow: none was
+   * supplied. */
+  {
+    id: "gloves-game-changer",
+    slug: "gloves-game-changer",
+    name: "Game Changer",
+    image: "/products/gloves-game-changer.webp",
+    mrp: 3400,
+    price: 2900,
+    categorySlug: "batting-gloves",
+  },
+  {
+    id: "gloves-robust",
+    slug: "gloves-robust",
+    name: "Robust",
+    image: "/products/gloves-robust.webp",
+    mrp: 2650,
+    price: 2300,
+    categorySlug: "batting-gloves",
+  },
+  {
+    id: "gloves-legend",
+    slug: "gloves-legend",
+    name: "Legend",
+    image: "/products/gloves-legend.webp",
+    mrp: 2400,
+    price: 2100,
+    categorySlug: "batting-gloves",
+  },
+  {
+    id: "gloves-signature",
+    slug: "gloves-signature",
+    name: "Signature",
+    image: "/products/gloves-signature.webp",
+    mrp: 1650,
+    price: 1450,
+    categorySlug: "batting-gloves",
+  },
+  {
+    id: "gloves-dragon-pro",
+    slug: "gloves-dragon-pro",
+    name: "Dragon Pro",
+    image: "/products/gloves-dragon-pro.webp",
+    mrp: 1500,
+    price: 1300,
+    categorySlug: "batting-gloves",
+  },
+  {
+    id: "gloves-platino",
+    slug: "gloves-platino",
+    name: "Platino",
+    image: "/products/gloves-platino.webp",
+    mrp: 1250,
+    price: 1100,
+    categorySlug: "batting-gloves",
+  },
+  /* ── Cricket kit bags ──────────────────────────────────────────────────────────
+   *
+   * Six models, names and prices as supplied, each with its own photograph. These
+   * replace six invented placeholders (Pro Cricket Kit Bag, Elite Wheelie Bag and
+   * the rest) in data/placeholder-products.ts.
+   *
+   * Slugs carry a `bag-` prefix. Dragon Pro and Robust are already glove routes and
+   * M&H 7000 is a KIS bat, so a bare slug here would be a collision, not a choice.
+   *
+   * Robust and Sturdy are both 2,800 and so carry the same `mrp`: two products at
+   * the same selling price showing different "was" figures is the kind of detail a
+   * customer notices and cannot explain.
+   *
+   * No brandSlug, on the same rule the Hard Tennis, pad and glove ranges follow:
+   * none was supplied. */
+  {
+    id: "bag-mh-7000",
+    slug: "bag-mh-7000",
+    name: "M&H 7000",
+    image: "/products/bag-mh-7000.webp",
+    mrp: 3750,
+    price: 3200,
+    categorySlug: "cricket-bags",
+  },
+  {
+    id: "bag-robust",
+    slug: "bag-robust",
+    name: "Robust",
+    image: "/products/bag-robust.webp",
+    mrp: 3200,
+    price: 2800,
+    categorySlug: "cricket-bags",
+  },
+  {
+    id: "bag-sturdy",
+    slug: "bag-sturdy",
+    name: "Sturdy",
+    image: "/products/bag-sturdy.webp",
+    mrp: 3200,
+    price: 2800,
+    categorySlug: "cricket-bags",
+  },
+  {
+    id: "bag-dragon-pro",
+    slug: "bag-dragon-pro",
+    name: "Dragon Pro",
+    image: "/products/bag-dragon-pro.webp",
+    mrp: 2200,
+    price: 1900,
+    categorySlug: "cricket-bags",
+  },
+  {
+    id: "bag-blaze-7000",
+    slug: "bag-blaze-7000",
+    name: "Blaze 7000",
+    image: "/products/bag-blaze-7000.webp",
+    mrp: 2050,
+    price: 1800,
+    categorySlug: "cricket-bags",
+  },
+  {
+    id: "bag-elite-duffle",
+    slug: "bag-elite-duffle",
+    name: "Elite Duffle",
+    image: "/products/bag-elite-duffle.webp",
+    mrp: 1700,
+    price: 1500,
+    categorySlug: "cricket-bags",
+  },
 ];
 
 /* Real stock first, then the 48 development placeholders for the equipment categories.
@@ -575,7 +783,6 @@ const stockedProducts: Product[] = [
 export const products: Product[] = [
   ...stockedProducts,
   ...placeholderBrandBats,
-  ...placeholderProducts,
   ...studioBats,
 ];
 

@@ -76,10 +76,18 @@ const KINDS = {
   cover: {
     label: "Category / brand cover",
     maxW: 1600,
-    maxH: 1200,
-    frames: [["banner", 4 / 3]],
+    /* 1600, not 1200. A cover card is not always a wide banner: the homepage carousel
+       renders it portrait (~0.77) and the equipment hub renders it landscape (~1.48),
+       so a portrait source is legitimate. A 1200 height cap silently threw away 39% of
+       the pixels of a 1024x1536 cover before Next ever resized it, and the cards came
+       out visibly soft. The budget is now square so neither orientation is penalised. */
+    maxH: 1600,
+    frames: [
+      ["homepage carousel", 10 / 13],
+      ["equipment hub card", 1.48],
+    ],
     out: "public/categories",
-    note: "wide banner",
+    note: "portrait on the carousel, landscape on the hub",
   },
 };
 

@@ -190,10 +190,10 @@ const GROUPS: FaqGroup[] = [
         q: "Do you sell anything besides bats?",
         a: (
           <>
-            Yes: gloves, pads, thigh guards, helmets, balls, shoes, kit bags and
-            accessories. Several equipment ranges are still being stocked and are
-            marked as placeholders on the site — we would rather show you that plainly
-            than quietly list something we cannot ship.
+            Yes: batting gloves, batting pads and cricket kit bags. Every model listed
+            is one we actually stock, with its own photograph and price — we would
+            rather show you a short catalogue that is real than a long one we cannot
+            ship.
           </>
         ),
       },

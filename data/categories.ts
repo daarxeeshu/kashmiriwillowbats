@@ -6,7 +6,7 @@ export const categories: Category[] = [
     slug: "kashmir-willow-bats",
     name: "Kashmir Willow Bats",
     descriptor: "Authentic valley willow for every level",
-    image: "/categories/kashmir-willow.jpg",
+    image: "/categories/kashmir-willow.webp",
     iconKey: "kashmir-willow",
     accent: "forest",
   },
@@ -24,7 +24,7 @@ export const categories: Category[] = [
       "Explore our English willow range, graded from Player Grade 1+ through Grade 4.",
     seoDescription:
       "Shop English willow cricket bats graded from Player Grade 1+ to Grade 4 at Kashmiri Willow Bats.",
-    image: "/categories/english-willow.jpg",
+    image: "/categories/english-willow.webp",
     iconKey: "english-willow",
     accent: "brass",
   },
@@ -48,7 +48,7 @@ export const categories: Category[] = [
     // people type.
     seoDescription:
       "Shop hard tennis bats designed for power, control and fast-paced tennis-ball cricket.",
-    image: "/categories/hard-tennis-bat.svg",
+    image: "/categories/hard-tennis-bat.webp",
     iconKey: "hard-tennis",
     accent: "charcoal",
   },
@@ -81,57 +81,9 @@ export const categories: Category[] = [
     catalogueDescription: "Protection, mobility and comfort for every innings.",
     seoDescription:
       "Shop cricket batting pads and leg guards balancing protection, mobility and comfort.",
-    image: "/categories/batting-pads.jpg",
+    image: "/categories/batting-pads.webp",
     iconKey: "pads",
     accent: "charcoal",
-  },
-  {
-    id: "thigh-guards",
-    slug: "thigh-guards",
-    name: "Thigh Guards",
-    descriptor: "Essential upper-leg protection",
-    catalogueDescription: "Lightweight protection where it matters.",
-    seoDescription:
-      "Shop cricket thigh guards and thigh pads offering lightweight upper-leg protection.",
-    image: "/categories/thigh-guards.jpg",
-    iconKey: "thigh-guard",
-    accent: "sage",
-  },
-  {
-    id: "helmets",
-    slug: "helmets",
-    name: "Helmets",
-    descriptor: "Safety-certified head protection",
-    catalogueDescription: "Protection engineered for confidence at the crease.",
-    seoDescription:
-      "Shop cricket helmets with grille and neck protection engineered for confidence at the crease.",
-    image: "/categories/helmets.jpg",
-    iconKey: "helmet",
-    accent: "forest",
-  },
-  {
-    id: "cricket-balls",
-    slug: "cricket-balls",
-    name: "Cricket Balls",
-    descriptor: "Match and practice balls",
-    catalogueDescription: "Match and training balls for every session.",
-    seoDescription:
-      "Shop leather cricket balls for match play and training sessions at Kashmiri Willow Bats.",
-    image: "/categories/cricket-balls.jpg",
-    iconKey: "ball",
-    accent: "brass",
-  },
-  {
-    id: "cricket-shoes",
-    slug: "cricket-shoes",
-    name: "Cricket Shoes",
-    descriptor: "Grip, comfort, and stability",
-    catalogueDescription: "Built for grip, movement and confidence across the crease.",
-    seoDescription:
-      "Shop cricket shoes and spikes built for grip, movement and stability across the crease.",
-    image: "/categories/cricket-shoes.jpg",
-    iconKey: "shoes",
-    accent: "warm",
   },
   {
     id: "cricket-bags",
@@ -147,21 +99,9 @@ export const categories: Category[] = [
       "Carry your complete game-day setup with purpose-built cricket bags.",
     seoDescription:
       "Shop cricket kit bags, wheelie bags and duffles built to carry a complete game-day setup.",
-    image: "/categories/cricket-bags.jpg",
+    image: "/categories/cricket-bags.webp",
     iconKey: "bag",
     accent: "charcoal",
-  },
-  {
-    id: "accessories",
-    slug: "accessories",
-    name: "Accessories",
-    descriptor: "Grips, tapes, guards & more",
-    catalogueDescription: "The finishing essentials for your cricket setup.",
-    seoDescription:
-      "Shop cricket accessories — bat grips, tapes, care kits and the finishing essentials for your setup.",
-    image: "/categories/accessories.jpg",
-    iconKey: "accessories",
-    accent: "sage",
   },
 ];
 

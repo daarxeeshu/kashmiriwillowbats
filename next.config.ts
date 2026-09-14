@@ -29,7 +29,11 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    /* 384 restored. Without it the list jumps 256 -> 640, so anything asking for a
+       width in between (the category carousel asks for 300, which is ~375 at DPR 1.25)
+       either gets 256 and looks soft or gets 640 and ships more bytes than the box
+       needs. It is a Next default and the gap was the pinch point. */
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     unoptimized: false, // keep optimization ON — local /public images work fine
   },
 
