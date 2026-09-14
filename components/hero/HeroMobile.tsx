@@ -1,6 +1,5 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useTransform, type MotionValue } from "framer-motion";
@@ -39,9 +38,9 @@ import { HeroParticles } from "./HeroParticles";
  *
  * ── The camera ──
  * Within those rules there is still room for the thing the desktop stage is for,
- * and this now has it: an 80svh track that pushes the bat forward, straightens it
- * toward the viewer, lifts the whole composition and warms the pool. What it
- * deliberately does not do is any of the desktop film's *staging* — no spec panels,
+ * and this now has it: an 80svh track that pushes the bat forward, lifts the whole
+ * composition and warms the pool. What it deliberately does not do is any of the
+ * desktop film's *staging* — no spec panels,
  * no macro blow-up, no headline entrance, no clip-path frame. It is one continuous
  * move, which is why it holds up on a phone where the desktop sequence would not.
  *
@@ -52,7 +51,7 @@ import { HeroParticles } from "./HeroParticles";
  * the bat further and makes it squat and wide. Measured at rest: 417px tall with 35px
  * of slack at 390x844, 252px with 8px at 360x640, and 168px with just 2px at 320x568.
  *
- * Two things follow, and between them they are the whole camera:
+ * One thing follows, and it is the whole camera:
  *
  *   The zoom grows the bat from its toe, not its centre. `transformOrigin: 50% 100%`
  *   puts the anchor on the band's bottom edge, so scale cannot move the bottom of the
@@ -60,12 +59,10 @@ import { HeroParticles } from "./HeroParticles";
  *   makes one scale value safe on a 35px slack and a 2px one alike. A centred origin
  *   has to be re-tuned per height and still fails; see the note on the origin below.
  *
- *   The straighten is off on the shortest rung. Rotation is not origin-proof the way
- *   scale is: at 48deg the bat's lowest corner is far to the right of the anchor, so
- *   turning it clockwise swings that corner *down* — about 6px for 5deg, against 2px
- *   of slack. Nothing about the origin can prevent that, so the rotation is simply
- *   not applied below 620px tall, where a 5deg change on a 48deg lean is invisible
- *   anyway. The zoom alone still reads as a push. See `useShortestRung` below.
+ * It used to be two: the zoom was paired with a 5deg straighten, suppressed on the
+ * shortest rung because rotation is not origin-proof the way scale is. That move is
+ * gone — not for clearance, but because it was narrowing the bat while the zoom was
+ * widening it, and winning. The measurement is with `batScale` below.
  *
  * The type then rises at the rate the zoom lifts the bat's top edge, so the gap to the
  * support line holds across the track, and stops short of sliding the eyebrow under
@@ -73,26 +70,11 @@ import { HeroParticles } from "./HeroParticles";
  * this move — see the notes on each value below.
  */
 
-/** True when the viewport is on the tilt ladder's bottom rung — the `max-height: 620px`
- *  step in globals.css, where .hero-bat-tilt leans the bat 48deg at 114% of its band.
- *
- *  A subscription rather than a one-shot read because it has to survive an orientation
- *  change, and `useSyncExternalStore` rather than an effect because the answer is
- *  needed in the value that renders: the server snapshot is `false`, which is what
- *  hydration matches, and React re-renders with the live one immediately after. The
- *  camera is a MotionValue, so being wrong for that single commit changes nothing that
- *  paints — the transform is written on the next frame either way. */
-function useShortestRung() {
-  return useSyncExternalStore(
-    (notify) => {
-      const mq = window.matchMedia("(max-height: 620px)");
-      mq.addEventListener("change", notify);
-      return () => mq.removeEventListener("change", notify);
-    },
-    () => window.matchMedia("(max-height: 620px)").matches,
-    () => false,
-  );
-}
+/* The `useShortestRung` subscription that used to live here is gone with the rotation
+   it existed to suppress — it watched `(max-height: 620px)` for the one rung where a
+   straighten would have swung the bat into the button. Scale from a toe origin is safe
+   at every rung without asking, so the component no longer needs to know the viewport
+   height at all, and the hero drops a matchMedia listener on every phone. */
 
 /** Entrance stagger, seconds. Order is the reading order of the column. Safe to
  *  delay because these drive transform-only keyframes. */
@@ -108,7 +90,6 @@ export function HeroMobile({ progress }: { progress: MotionValue<number> }) {
   /* Spring-smoothed and reduced-motion-parked upstream in HeroSequence, so this
      component has no scroll wiring of its own — one `useScroll` and one spring
      serve both compositions. */
-  const shortest = useShortestRung();
 
   // The particle bands share the desktop curve, so feed them only its calm head.
   // Past ~0.3 that curve starts the dolly blow-past, which has no counterpart here.
@@ -127,14 +108,26 @@ export function HeroMobile({ progress }: { progress: MotionValue<number> }) {
      360x640 and 320x568 — the same value, three different results, which is what a
      centred origin costs. */
   const batScale = useTransform(progress, [0, 0.62, 1], [1, 1.06, 1.08]);
-  /* Zero on the bottom rung. Unlike scale, rotation is not made safe by the origin:
-     at a 48deg lean the bat's lowest corner sits far right of the anchor, so rotating
-     it toward upright swings that corner down and into the button — ~6px for 5deg
-     where there are 2px to spend. On the taller rungs the same 5deg is comfortably
-     absorbed by 8-35px of slack, so it stays there and only the 320-tall class of
-     phone trades it away. It has nothing to lose visually: 43deg reads no differently
-     from 48deg, and the zoom is carrying the move regardless. */
-  const batStraighten = useTransform(progress, [0, 1], [0, shortest ? 0 : 5]);
+  /* ── Why there is no straighten any more ──
+     There was one: 0 -> 5deg toward upright, off on the shortest rung because at a
+     48deg lean it swung the bat's low corner into the button. The clearance reasoning
+     was right, but it was guarding a move that was working against the zoom.
+
+     Rotating a leaning object toward upright makes its bounding box narrower and
+     taller. Measured across the track at 375x812, with the 8% zoom running: the bat
+     went from 210px wide to 197px. It was scaled up 8% and still ended 6% narrower —
+     the 5deg cost about 13% of width on its own. So the thing the camera is for, the
+     product coming forward, was being cancelled in the one dimension a phone has to
+     spare, and what actually read on screen was a slight recede.
+
+     Zoom alone cannot buy the width back either: it would take ~21% to overcome the
+     rotation, and the documented ceiling here is ~10% before the blade crowds the
+     support line. So the rotation goes and the zoom stays. The bat now widens 8%
+     across the track instead of narrowing 6% — a 14% swing toward the intended read,
+     with the toe still pinned by `transformOrigin` and the clearance to SHOP NOW
+     unchanged at every rung (verified at 375x812, 360x640 and 320x568).
+
+     It costs one transform property per frame, which is the cheap direction. */
 
   /* The type rises and the bat does not, which is where the parallax comes from: the
      headline slides up past a planted product rather than the pair of them moving
@@ -254,7 +247,6 @@ export function HeroMobile({ progress }: { progress: MotionValue<number> }) {
             className="h-full"
             style={{
               scale: batScale,
-              rotate: batStraighten,
               /* The toe is the anchor, not the centre — this one number is what makes
                  the move safe at every viewport height. Growth from a bottom origin is
                  entirely upward, into the empty stage, so the distance from the bat to
