@@ -4,10 +4,10 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { FadeIn } from "@/components/ui/FadeIn";
 
 const reviewPlaceholders = [
-  { id: "unboxing", label: "Unboxing", note: "Placeholder — replace with customer video" },
-  { id: "ping", label: "Ping test", note: "Placeholder — replace with customer video" },
-  { id: "match", label: "Match use", note: "Placeholder — replace with customer video" },
-  { id: "review", label: "Customer review", note: "Placeholder — replace with customer video" },
+  { id: "unboxing", label: "Unboxing" },
+  { id: "ping", label: "Ping test" },
+  { id: "match", label: "Match use" },
+  { id: "review", label: "Customer review" },
 ];
 
 export function VideoReviews() {
@@ -46,7 +46,6 @@ export function VideoReviews() {
                     <p className="mt-4 text-sm font-semibold text-white">
                       {item.label}
                     </p>
-                    <p className="mt-2 text-[12px] text-white/60">{item.note}</p>
                   </div>
                 </div>
               </div>
